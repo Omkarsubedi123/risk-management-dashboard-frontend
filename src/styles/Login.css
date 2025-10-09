@@ -1,0 +1,98 @@
+/* Login page background and layout */
+.login-page {
+  min-height: 100vh;
+  width: 100%;
+  background-color: #f5f7fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+/* Card */
+.login-card {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 900px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* Left side */
+.login-left {
+  flex: 1 1 400px;
+  padding: 2rem;
+}
+
+/* Right side */
+.login-right {
+  flex: 1 1 300px;
+  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  color: #fff;
+  padding: 2rem;
+}
+
+/* Login title */
+.login-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.login-subtext {
+  color: #6c757d;
+  margin-bottom: 1.5rem;
+}
+
+/* Buttons and links */
+.login-btn {
+  font-weight: 600;
+}
+
+.signup-link a {
+  color: #2575fc;
+  text-decoration: none;
+}
+
+.signup-link a:hover {
+  text-decoration: underline;
+}
+
+/* Right side animation */
+.animated-text {
+  font-size: 1.8rem;
+  font-weight: 700;
+  animation: fadeIn 1.5s ease-in-out;
+}
+
+.animated-caption {
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  animation: fadeIn 2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translateY(-10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Chart image */
+.chart-image {
+  max-width: 100%;
+  height: auto;
+  margin-top: 1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .login-card {
+    flex-direction: column;
+  }
+
+  .login-right {
+    display: none !important;
+  }
+}

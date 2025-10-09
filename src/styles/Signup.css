@@ -1,0 +1,112 @@
+/* PAGE WRAPPER */
+.signup-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f3f4f6, #d1d5db);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 1rem; /* Reduced padding */
+  box-sizing: border-box;
+}
+
+/* SIGNUP CARD */
+.signup-card {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  max-width: 900px; /* Slightly narrower */
+  background-color: white;
+  border-radius: 0.75rem; /* Slightly smaller radius */
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08); /* Softer shadow */
+  animation: fadeIn 0.6s ease-in-out;
+  flex-wrap: wrap;
+}
+
+/* FORM SECTION */
+.signup-left,
+.signup-right {
+  width: 50%;
+  box-sizing: border-box;
+}
+
+/* Left Side Styling */
+.signup-left {
+  padding: 1.5rem 1.25rem; /* Reduced padding */
+}
+
+/* Right Side Styling */
+.signup-right {
+  background: linear-gradient(to bottom right, #3b82f6, #2563eb);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 1rem; /* Reduced padding */
+  text-align: center;
+  gap: 0.5rem; /* Slightly smaller gap */
+  min-height: 100%;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .signup-card {
+    flex-direction: column;
+  }
+
+  .signup-left,
+  .signup-right {
+    width: 100%;
+  }
+
+  .signup-right .text-section {
+    display: none;
+    margin-top: 1rem;
+  }
+
+  .signup-left {
+    padding: 1.25rem;
+  }
+
+  .signup-page {
+    height: auto;
+    overflow-y: auto;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px); /* Less movement */
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02); /* Subtle pulse */
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes floatChart {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
