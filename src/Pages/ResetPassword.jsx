@@ -36,9 +36,9 @@ const ResetPassword = () => {
       setLoading(true);
       const response = await axios.post(`${backendUrl}/api/users/password/reset/confirm/`, {
         email,
-        otp_code: otp,
+        otp: otp,
         new_password: newPassword,
-        confirm_password: confirmPassword,
+        con_password: confirmPassword,
       });
 
       if (response.status === 200) {
@@ -111,7 +111,7 @@ const ResetPassword = () => {
             {loading ? "Resetting..." : "Reset Password"}
           </button>
 
-          <button type="button" className="reset-password-btn-secondary mt-2" onClick={() => navigate("/login")}>
+          <button type="button" className="reset-password-btn-secondary mt-2" onClick={() => navigate("/login", { state: { email } })}>
             Cancel
           </button>
         </form>

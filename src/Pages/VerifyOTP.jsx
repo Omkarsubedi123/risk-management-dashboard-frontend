@@ -35,7 +35,7 @@ const VerifyOtp = () => {
 
       if (response.status === 200) {
         setMessage("Email verified successfully! Redirecting to login...");
-        setTimeout(() => navigate("/login"), 3000);
+        setTimeout(() => navigate("/login", { state: { email } }), 2000);
       }
     } catch (err) {
       setError(err.response?.data?.error || "OTP verification failed.");

@@ -55,7 +55,7 @@ const Signup = () => {
         setMessage("Signup successful! Please check your email for the OTP to verify your account.");
         setTimeout(() => {
           navigate("/verify-otp", { state: { email: form.email } });
-        }, 3000);
+        }, 2000);
       }
     } catch (err) {
       if (err.response?.data) {
