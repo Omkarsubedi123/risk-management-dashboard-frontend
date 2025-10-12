@@ -1,0 +1,21 @@
+.dashboard-header {
+  background-color: #6baed6;
+}
+
+.project-select {
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.summary-card {
+  border: none;
+  border-radius: 10px;
+  background: #f8f9fa;
+}
+
+.summary-card h4 {
+  color: #333;
+  font-weight: bold;
+}

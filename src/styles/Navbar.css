@@ -1,0 +1,13 @@
+.navbar {
+  font-family: "Poppins", sans-serif;
+}
+
+.nav-link {
+  color: #ddd !important;
+  margin-right: 10px;
+}
+
+.nav-link:hover {
+  color: #fff !important;
+  text-decoration: underline;
+}
