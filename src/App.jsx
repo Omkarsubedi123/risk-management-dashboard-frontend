@@ -6,6 +6,7 @@ import Signup from './Pages/Signup.jsx'
 import VerifyOtp from './Pages/VerifyOTP.jsx'
 import ForgetPassword from './Pages/ForgetPassword.jsx'
 import ResetPassword from './Pages/ResetPassword.jsx'
+import PMDashboard from './Pages/PMDashboard.jsx'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -21,6 +22,7 @@ function App() {
       <Route path="/verify-otp" element={<VerifyOtp />} />
       <Route path="/forget-password" element={<ForgetPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/pmdashboard" element={<PMDashboard />} />
     </Routes>
   )
 }
