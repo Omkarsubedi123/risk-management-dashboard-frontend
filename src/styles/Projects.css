@@ -1,0 +1,23 @@
+/* src/styles/project.css */
+.container {
+  max-width: 900px;
+}
+
+.card {
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary {
+  background-color: #0069d9;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #0053b3;
+}
