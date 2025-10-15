@@ -17,7 +17,7 @@ const AppNavbar = () =>{
         <Navbar.Toggle aria-controls="navbar-nav" />
         <Navbar.Collapse id="navbar-nav" className="justify-content-between">
           <Nav className="me-auto">
-            <Nav.Link onClick={() => navigate("/pm/dashboard")}>Dashboard</Nav.Link>
+            <Nav.Link onClick={() => navigate("/pmdashboard")}>Dashboard</Nav.Link>
             <Nav.Link onClick={() => navigate("/pm/projects")}>Projects</Nav.Link>
             <Nav.Link onClick={() => navigate("/pm/risks")}>Risks</Nav.Link>
             <Nav.Link onClick={() => navigate("/pm/heatmap")}>Heat Map</Nav.Link>

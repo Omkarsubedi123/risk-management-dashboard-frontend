@@ -53,7 +53,7 @@ const Login = () => {
       saveSession(response.data);
 
       const { role } = response.data;
-      if (role === "PM") navigate("/dashboard/pm");
+      if (role === "PM") navigate("/pmdashboard");
       else navigate("/dashboard/tm");
     } catch (error) {
       console.error("Login error:", error);
