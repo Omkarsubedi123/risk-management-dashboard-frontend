@@ -1,7 +1,6 @@
-// src/pages/CreateProject.jsx
 import React, { useState } from "react";
 import axios from "axios";
-import "./../styles/Projects.css"
+
 const CreateProjects = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -11,14 +10,23 @@ const CreateProjects = () => {
   });
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      const token = localStorage.getItem("access");
-      const headers = { Authorization: `Bearer ${token}` };
+      const token = localStorage.getItem("access") || sessionStorage.getItem("access");
+
+      if (!token) {
+        alert("❌ No token found! Please login first.");
+        window.location.href = "/login";
+      }
+
       const payload = {
         name: formData.name,
         description: formData.description,
@@ -27,14 +35,26 @@ const CreateProjects = () => {
             ? formData.otherSector
             : formData.sector,
       };
-      await axios.post("http://127.0.0.1:8000/api/projects/", payload, {
-        headers,
-      });
+
+      const response = await axios.post(
+        "http://127.0.0.1:8000/api/projects/",
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("SUCCESS:", response.data);
+
       alert("✅ Project created successfully!");
       setFormData({ name: "", description: "", sector: "", otherSector: "" });
+
     } catch (err) {
-      console.error(err);
-      alert("❌ Failed to create project.");
+      console.error("ERROR:", err.response ? err.response.data : err);
+      alert("❌ Failed to create project. Check console.");
     }
   };
 
@@ -42,6 +62,7 @@ const CreateProjects = () => {
     <div className="container mt-4">
       <div className="card shadow-sm p-4">
         <h3 className="mb-4 text-center">Create New Project</h3>
+
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label className="form-label">Project Name</label>

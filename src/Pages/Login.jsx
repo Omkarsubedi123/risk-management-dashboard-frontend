@@ -20,6 +20,7 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // AUTO LOGIN CHECK
   useEffect(() => {
     const access = localStorage.getItem("access") || sessionStorage.getItem("access");
     const role = localStorage.getItem("role") || sessionStorage.getItem("role");
@@ -28,19 +29,23 @@ const Login = () => {
       if (role === "PM") navigate("/dashboard/pm");
       else navigate("/dashboard/tm");
     }
-  }, [navigate, location.state]);
+  }, []);
 
+  // FIXED: Safe session saving
   const saveSession = (data) => {
-    const storage = rememberMe ? localStorage : sessionStorage;
-
-    storage.setItem("access", data.access);
-    storage.setItem("refresh", data.refresh);
-    storage.setItem("role", data.role);
-    storage.setItem("username", data.username);
-    if (data.user_id) storage.setItem("user_id", data.user_id);
-
-    if (rememberMe) sessionStorage.clear();
-    else localStorage.clear();
+    if (rememberMe) {
+      localStorage.setItem("access", data.access);
+      localStorage.setItem("refresh", data.refresh);
+      localStorage.setItem("role", data.role);
+      localStorage.setItem("username", data.username);
+      if (data.user_id) localStorage.setItem("user_id", data.user_id);
+    } else {
+      sessionStorage.setItem("access", data.access);
+      sessionStorage.setItem("refresh", data.refresh);
+      sessionStorage.setItem("role", data.role);
+      sessionStorage.setItem("username", data.username);
+      if (data.user_id) sessionStorage.setItem("user_id", data.user_id);
+    }
   };
 
   const handleLogin = async (e) => {
@@ -49,25 +54,27 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${backendUrl}/api/users/login/`, { email, password });
+      // FIXED: JWT endpoint
+      const response = await axios.post(`${backendUrl}/api/users/login/`, {
+        email,
+        password
+      });
+
       saveSession(response.data);
 
       const { role } = response.data;
-      if (role === "PM") navigate("/pmdashboard");
-      else navigate("/dashboard/tm");
+
+      // FIXED: correct route
+      if (role === "PM") navigate("/pmDashboard");
+      else navigate("/tmDashboard");
     } catch (error) {
       console.error("Login error:", error);
 
-      if (error.response?.data?.detail === "User account is not verified. Please verify your email.") {
-        setErrorMsg("Account not verified. Redirecting to OTP verification...");
-        setTimeout(() => {
-          navigate("/verify-otp", { state: { email } });
-        }, 3000);
-      } else if (error.response?.data) {
-        setErrorMsg(error.response.data.detail || "Invalid email or password.");
-      } else {
-        setErrorMsg("Something went wrong. Please try again.");
-      }
+      const message =
+        error.response?.data?.detail ||
+        "Invalid email or password. Please try again.";
+
+      setErrorMsg(message);
     } finally {
       setLoading(false);
     }
@@ -76,8 +83,10 @@ const Login = () => {
   return (
     <>
       <Header />
+
       <div className="login-page d-flex align-items-center justify-content-center">
         <div className="login-card shadow-lg">
+
           <div className="login-left">
             <h2 className="login-title">Welcome Back!</h2>
             <p className="login-subtext">Risk Management Dashboard</p>
@@ -131,13 +140,15 @@ const Login = () => {
                     Remember me
                   </label>
                 </div>
-                <a style={{ textDecoration: "none" }} href="/forget-password" className="forgot-link">Forgot password?</a>
+                <a href="/forget-password" className="forgot-link" style={{ textDecoration: "none" }}>
+                  Forgot password?
+                </a>
               </div>
 
               <button type="submit" className="btn btn-primary w-100 login-btn" disabled={loading}>
                 {loading ? (
                   <>
-                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    <span className="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
                     Logging in...
                   </>
                 ) : "Login"}
@@ -154,8 +165,10 @@ const Login = () => {
             <p className="animated-caption">Manage risks like a pro</p>
             <img src={LandingLogo} alt="Risk Chart" className="chart-image mt-4" />
           </div>
+
         </div>
       </div>
+
       <Footer />
     </>
   );
