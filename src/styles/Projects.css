@@ -1,4 +1,4 @@
-/* src/styles/project.css */
+src/styles/project.css
 .container {
   max-width: 900px;
 }
@@ -21,3 +21,39 @@
 .btn-primary:hover {
   background-color: #0053b3;
 }
+/* Make footer stick to bottom */
+.project-page-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Make cards grow a bit taller */
+.project-card {
+  height: 100%;
+  min-height: 240px;
+  transition: transform 0.2s ease;
+}
+
+.project-card:hover {
+  transform: scale(1.02);
+}
+
+/* Make footer stick to bottom */
+.project-page-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Make cards grow a bit taller */
+.project-card {
+  height: 100%;
+  min-height: 240px;
+  transition: transform 0.2s ease;
+}
+
+.project-card:hover {
+  transform: scale(1.02);
+}
+
