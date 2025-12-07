@@ -10,6 +10,7 @@ import PMDashboard from './Pages/PMDashboard.jsx'
 import CreateProject from './Pages/CreateProjects.jsx'
 import ProjectList from './Pages/ProjectList.jsx'
 import ProjectDetail from './Pages/ProjectDetail.jsx'
+import EditProject from './Pages/EditProject.jsx'
 
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
       <Route path="/create-project" element={<CreateProject />} />
       <Route path="/projects" element={<ProjectList />} />
       <Route path="/project/:id" element={<ProjectDetail />} />
+      <Route path="/projects/:id/edit" element={<EditProject />} />
     </Routes>
   )
 }
