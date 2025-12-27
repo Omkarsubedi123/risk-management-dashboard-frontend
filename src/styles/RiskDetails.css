@@ -122,3 +122,56 @@
 .rd-badge.high {
   background: #fee2e2;
 }
+/* ===== MITIGATION ===== */
+.rd-mitigation {
+  margin-top: 24px;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 12px;
+}
+
+.rd-mitigation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rd-mitigation textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 10px;
+  margin-top: 8px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.rd-mitigation select {
+  margin-top: 10px;
+  padding: 8px;
+  border-radius: 8px;
+}
+
+.rd-mitigation-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.rd-status {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.rd-status.NotStarted {
+  background: #e5e7eb;
+}
+.rd-status.InProgress {
+  background: #fde68a;
+}
+.rd-status.Completed {
+  background: #bbf7d0;
+}

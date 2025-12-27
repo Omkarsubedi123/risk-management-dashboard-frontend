@@ -1,0 +1,88 @@
+.re-page {
+  max-width: 900px;
+  margin: 30px auto;
+  padding: 10px;
+}
+
+.re-back {
+  background: none;
+  border: none;
+  color: #007bff;
+  margin-bottom: 10px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.re-card {
+  background: #ffffff;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+.re-card.low { border-left: 6px solid #28a745; }
+.re-card.medium { border-left: 6px solid #ffc107; }
+.re-card.high { border-left: 6px solid #dc3545; }
+
+.re-card h2 {
+  margin-bottom: 20px;
+}
+
+.re-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 15px;
+}
+
+.re-grid label,
+.re-desc label {
+  font-weight: 600;
+  margin-bottom: 5px;
+  display: block;
+}
+
+.re-grid input,
+.re-grid select,
+.re-desc textarea {
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.re-desc textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.re-calc {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 15px;
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+.re-calc p {
+  font-weight: bold;
+  margin: 0;
+}
+
+.re-loss {
+  color: #dc3545;
+}
+
+.re-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.re-loading {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+}
