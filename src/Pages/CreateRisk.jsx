@@ -158,7 +158,7 @@ const CreateRisk = () => {
             <button
               type="button"
               className="btn btn-light"
-              onClick={() => navigate(`/project/${id}`, { replace: true })}
+              onClick={() => navigate(`/projects/${id}`, { replace: true })}
             >
               Cancel
             </button>
