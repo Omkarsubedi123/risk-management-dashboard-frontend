@@ -207,7 +207,7 @@ const ProjectDetail = () => {
                     <button
                       type="button"
                       className="btn btn-link"
-                      onClick={() => navigate(`/risks/${risk.id}`)}
+                      onClick={() => navigate(`/risks/${risk.id}`,{state:{projectId:id}})}
                     >
                       View →
                     </button>
