@@ -14,7 +14,7 @@ import EditProject from './Pages/EditProject.jsx'
 import CreateRisk from './Pages/CreateRisk.jsx'
 // import RiskList from "./pages/risks/RiskList";
 import RiskDetails from "./Pages/RiskDetails.jsx";
-// import RiskEdit from "./Pages/RiskEdit.jsx";
+import RiskEdit from "./Pages/RiskEdit.jsx";
 
 
 function App() {
@@ -38,7 +38,7 @@ function App() {
       <Route path="/projects/:id/edit" element={<EditProject />} />
       <Route path="/projects/:id/risks/create" element={<CreateRisk />} />
       <Route path="/risks/:id" element={<RiskDetails />} />
-      {/* <Route path="/risks/:id/edit" element={<RiskEdit />} /> */}
+      <Route path="/risks/:id/edit" element={<RiskEdit />} />
 
 
 
