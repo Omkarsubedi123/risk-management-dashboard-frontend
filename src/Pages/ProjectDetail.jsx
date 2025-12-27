@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import MessageModal from "../components/MessageModal";
 import ConfirmModal from "../components/ConfirmModal";
-import "./../styles/ProjectDetails.CSS";
+import "../styles/ProjectDetails.css";
 
 const ProjectDetail = () => {
   const { id } = useParams();
@@ -11,36 +11,46 @@ const ProjectDetail = () => {
 
   const [project, setProject] = useState(null);
   const [status, setStatus] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const [risks, setRisks] = useState([]);
+  const [riskLoading, setRiskLoading] = useState(true);
 
   const [msgOpen, setMsgOpen] = useState(false);
-  const [msgCfg, setMsgCfg] = useState({ title: "", message: "", variant: "success" });
+  const [msgCfg, setMsgCfg] = useState({
+    title: "",
+    message: "",
+    variant: "success",
+  });
 
   const [confirmOpen, setConfirmOpen] = useState(false);
 
+  const getToken = () =>
+    localStorage.getItem("access") || sessionStorage.getItem("access");
+
   useEffect(() => {
-    fetchProject();
+    loadData();
     // eslint-disable-next-line
   }, [id]);
 
-  const getToken = () => localStorage.getItem("access") || sessionStorage.getItem("access");
+  const loadData = async () => {
+    await Promise.all([fetchProject(), fetchRisks()]);
+    setLoading(false);
+  };
+
+  /* ================= PROJECT ================= */
 
   const fetchProject = async () => {
-    setLoading(true);
     try {
       const token = getToken();
-      if (!token) throw new Error("Not authenticated");
-      const res = await axios.get(`http://127.0.0.1:8000/api/projects/${id}/`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axios.get(
+        `http://127.0.0.1:8000/api/projects/${id}/`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       setProject(res.data);
       setStatus(res.data.status || "active");
-    } catch (err) {
-      console.error("Error loading project:", err);
-      setMsgCfg({ title: "Error", message: "Could not load project. Try again.", variant: "error" });
-      setMsgOpen(true);
-    } finally {
-      setLoading(false);
+    } catch {
+      showMsg("Error", "Failed to load project.", "error");
     }
   };
 
@@ -54,14 +64,9 @@ const ProjectDetail = () => {
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setMsgCfg({ title: "Status Updated", message: "Project status updated successfully.", variant: "success" });
-      setMsgOpen(true);
-      // refresh after short delay so user sees updated timestamps
-      setTimeout(fetchProject, 700);
-    } catch (err) {
-      console.error("Error updating status:", err);
-      setMsgCfg({ title: "Update Failed", message: "Unable to update project status.", variant: "error" });
-      setMsgOpen(true);
+      showMsg("Updated", "Project status updated.", "success");
+    } catch {
+      showMsg("Failed", "Status update failed.", "error");
     }
   };
 
@@ -72,122 +77,154 @@ const ProjectDetail = () => {
       await axios.delete(`http://127.0.0.1:8000/api/projects/${id}/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setMsgCfg({ title: "Deleted", message: "Project deleted successfully.", variant: "success" });
-      setMsgOpen(true);
-      setTimeout(() => navigate("/projects"), 900);
-    } catch (err) {
-      console.error("Error deleting project:", err);
-      setMsgCfg({ title: "Delete Failed", message: "Unable to delete project.", variant: "error" });
-      setMsgOpen(true);
+      navigate("/projects");
+    } catch {
+      showMsg("Delete Failed", "Unable to delete project.", "error");
     }
   };
 
-  const openEdit = () => navigate(`/projects/${id}/edit`, { state: { project } });
+  /* ================= RISKS ================= */
 
-  if (loading || !project) return <div className="pd-loading">Loading project details…</div>;
+  const fetchRisks = async () => {
+    try {
+      const token = getToken();
+      const res = await axios.get(
+        `http://127.0.0.1:8000/api/risks/?project=${id}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setRisks(res.data);
+    } catch {
+      showMsg("Error", "Failed to load risks.", "error");
+    } finally {
+      setRiskLoading(false);
+    }
+  };
+
+  const showMsg = (title, message, variant) => {
+    setMsgCfg({ title, message, variant });
+    setMsgOpen(true);
+  };
+
+  if (loading || !project)
+    return <div className="pd-loading">Loading project…</div>;
 
   return (
     <div className="pd-page">
+    <div className="pd-container">
+      {/* ================= PROJECT CARD ================= */}
       <div className="pd-card">
-        <div className="pd-top">
-          {/* <button className="btn btn-link" onClick={() => navigate("/projects")}>
-            ← Back to Projects
-          </button> */}
-          <div className="pd-top">
-          <button
-            onClick={() => navigate("/projects")}
-            style={{
-              background: "#e8eef4",
-              padding: "10px 18px",
-              borderRadius: "10px",
-              fontSize: "15px",
-              fontWeight: 600,
-              color: "#2a3f54",
-              border: "none",
-              cursor: "pointer",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "6px",
-              transition: "all 0.25s ease",
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.background = "#cfd9e3";
-              e.target.style.color = "#1a2733";
-              e.target.style.transform = "translateX(-3px)";
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.background = "#e8eef4";
-              e.target.style.color = "#2a3f54";
-              e.target.style.transform = "translateX(0)";
-            }}
-          >
-            ← Back
-          </button>
-        </div>
-          <div />
-        </div>
+        <button className="btn btn-light" onClick={() => navigate("/projects")}>
+          ← Back to Projects
+        </button>
 
         <h2 className="pd-title">{project.name}</h2>
         <p className="pd-sub">{project.sector}</p>
-
-        <p className="pd-desc">{project.description || "No description provided."}</p>
+        <p className="pd-desc">
+          {project.description || "No description provided."}
+        </p>
 
         <div className="pd-grid">
           <div className="pd-row">
             <div className="pd-label">Status</div>
-            <div className="pd-value">
-              <select value={status} onChange={handleStatusChange} className="pd-select">
-                <option value="active">Active</option>
-                <option value="on_hold">On Hold</option>
-                <option value="completed">Completed</option>
-              </select>
-            </div>
+            <select value={status} onChange={handleStatusChange}>
+              <option value="active">Active</option>
+              <option value="on_hold">On Hold</option>
+              <option value="completed">Completed</option>
+            </select>
           </div>
 
           <div className="pd-row">
             <div className="pd-label">Created</div>
-            <div className="pd-value">{new Date(project.created_at).toLocaleString()}</div>
+            <div>{new Date(project.created_at).toLocaleString()}</div>
           </div>
 
           <div className="pd-row">
             <div className="pd-label">Updated</div>
-            <div className="pd-value">{new Date(project.updated_at).toLocaleString()}</div>
-          </div>
-
-          <div className="pd-row">
-            <div className="pd-label">Created By</div>
-            <div className="pd-value">{project.created_by_email || "—"}</div>
+            <div>{new Date(project.updated_at).toLocaleString()}</div>
           </div>
         </div>
 
         <div className="pd-actions">
-          <button className="btn btn-secondary" onClick={() => fetchProject()}>
-            ⟳ Refresh
+          <button
+            className="btn btn-outline"
+            onClick={() =>
+              navigate(`/projects/${id}/edit`, { state: { project } })
+            }
+          >
+            ✏️ Edit Project
           </button>
 
-          <div className="pd-actions-right">
-            <button className="btn btn-outline" onClick={openEdit}>
-              ✏️ Edit
-            </button>
-            <button className="btn btn-danger" onClick={() => setConfirmOpen(true)}>
-              🗑️ Delete
-            </button>
-          </div>
+          <button
+            className="btn btn-danger"
+            onClick={() => setConfirmOpen(true)}
+          >
+            🗑 Delete Project
+          </button>
         </div>
       </div>
 
-      <MessageModal
-        open={msgOpen}
-        title={msgCfg.title}
-        message={msgCfg.message}
-        variant={msgCfg.variant === "error" ? "error" : "success"}
-        onClose={() => setMsgOpen(false)}
-      />
+      {/* ================= RISK LIST ================= */}
+      <div className="pd-card risk-card">
+        <div className="pd-top">
+          <h3>Project Risks</h3>
+          <button
+            className="btn btn-primary"
+            onClick={() => navigate(`/projects/${id}/risks/create`)}
+          >
+            ➕ Add Risk
+          </button>
+        </div>
 
+        {riskLoading ? (
+          <p>Loading risks…</p>
+        ) : risks.length === 0 ? (
+          <p className="pd-muted">No risks added yet.</p>
+        ) : (
+          <table className="pd-table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Score</th>
+                <th>Level</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {risks.map((risk) => (
+                <tr key={risk.id}>
+                  <td>{risk.title}</td>
+                  <td>{risk.risk_score}</td>
+                  <td>
+                    <span
+                      className={`badge badge-${risk.risk_level?.toLowerCase()}`}
+                    >
+                      {risk.risk_level}
+                    </span>
+                  </td>
+                  <td>{risk.status}</td>
+                  <td>
+                    <button
+                      type="button"
+                      className="btn btn-link"
+                      onClick={() => navigate(`/risks/${risk.id}`)}
+                    >
+                      View →
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+      </div>
+
+      <MessageModal {...msgCfg} open={msgOpen} onClose={() => setMsgOpen(false)} />
       <ConfirmModal
         open={confirmOpen}
         title="Confirm Delete"
-        message="Are you sure you want to delete this project? This action cannot be undone."
+        message="Are you sure you want to delete this project?"
         onConfirm={handleDelete}
         onCancel={() => setConfirmOpen(false)}
       />

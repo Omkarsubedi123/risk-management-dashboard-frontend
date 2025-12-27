@@ -222,3 +222,112 @@
   .pd-label { min-width: 100px; font-size: 13px; }
   .pd-title { font-size: 20px; }
 }
+
+/* ===== RISK TABLE ===== */
+.risk-card {
+  margin-top: 28px;
+}
+
+.pd-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 14px;
+}
+
+.pd-table th {
+  text-align: left;
+  font-size: 13px;
+  color: #475569;
+  padding: 10px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.pd-table td {
+  padding: 10px;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 14px;
+}
+
+.pd-table tr:hover {
+  background: #f8fafc;
+}
+
+/* ===== BADGES ===== */
+.badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge-low {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.badge-medium {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.badge-high {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.pd-muted {
+  color: #64748b;
+  font-size: 14px;
+}
+
+/* ===== PAGE COLUMN LAYOUT FIX ===== */
+.pd-container {
+  width: 100%;
+  max-width: 920px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* Disable hover lift for risk table card */
+.risk-card:hover {
+  transform: none;
+  box-shadow: 0 8px 20px rgba(18, 38, 63, 0.08);
+}
+
+/* Make risk card visually secondary */
+.risk-card {
+  padding-top: 22px;
+}
+
+/* Status row alignment fix */
+.pd-row select {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #e6eef8;
+  background: white;
+  font-size: 14px;
+}
+
+/* Project header spacing */
+.pd-card > button {
+  margin-bottom: 10px;
+}
+
+/* Action buttons spacing */
+.pd-actions {
+  margin-top: 18px;
+}
+
+/* Risk header spacing */
+.pd-top h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #0f172a;
+}
+
+/* Table action link fix */
+.pd-table .btn-link {
+  padding: 0;
+  font-weight: 600;
+}

@@ -149,7 +149,7 @@ const EditProject = () => {
           </button>
         </div>
 
-        <h2  style={{ padding: "8px 0" }} className="pd-title pt-5px">Edit Project</h2>
+        <h2  style={{ padding: "8z``px 0" }} className="pd-title pt-5px">Edit Project</h2>
 
         <div className="pd-form">
 

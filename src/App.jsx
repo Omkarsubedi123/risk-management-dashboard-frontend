@@ -11,6 +11,10 @@ import CreateProject from './Pages/CreateProjects.jsx'
 import ProjectList from './Pages/ProjectList.jsx'
 import ProjectDetail from './Pages/ProjectDetail.jsx'
 import EditProject from './Pages/EditProject.jsx'
+import CreateRisk from './Pages/CreateRisk.jsx'
+// import RiskList from "./pages/risks/RiskList";
+import RiskDetails from "./Pages/RiskDetails.jsx";
+// import RiskEdit from "./Pages/RiskEdit.jsx";
 
 
 function App() {
@@ -30,8 +34,14 @@ function App() {
       <Route path="/pmdashboard" element={<PMDashboard />} />
       <Route path="/create-project" element={<CreateProject />} />
       <Route path="/projects" element={<ProjectList />} />
-      <Route path="/project/:id" element={<ProjectDetail />} />
+      <Route path="/projects/:id" element={<ProjectDetail />} />
       <Route path="/projects/:id/edit" element={<EditProject />} />
+      <Route path="/projects/:id/risks/create" element={<CreateRisk />} />
+      <Route path="/risks/:id" element={<RiskDetails />} />
+      {/* <Route path="/risks/:id/edit" element={<RiskEdit />} /> */}
+
+
+
     </Routes>
   )
 }

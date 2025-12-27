@@ -1,0 +1,74 @@
+.cr-page {
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.cr-card {
+  width: 100%;
+  max-width: 650px;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.cr-card h2 {
+  margin-bottom: 6px;
+}
+
+.cr-sub {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.cr-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cr-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.cr-group label {
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.cr-group input,
+.cr-group textarea,
+.cr-group select {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.cr-row {
+  display: flex;
+  gap: 16px;
+}
+
+.cr-row .cr-group {
+  flex: 1;
+}
+
+.cr-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.cr-error {
+  background: #ffe5e5;
+  color: #b40000;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  font-size: 14px;
+}

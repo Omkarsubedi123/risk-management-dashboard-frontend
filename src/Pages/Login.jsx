@@ -26,8 +26,8 @@ const Login = () => {
     const role = localStorage.getItem("role") || sessionStorage.getItem("role");
 
     if (access && role && !location.state?.forceLogin) {
-      if (role === "PM") navigate("/dashboard/pm");
-      else navigate("/dashboard/tm");
+      if (role === "PM") navigate("/pmdashboard");
+      else navigate("/tmdashboard");
     }
   }, []);
 
@@ -65,7 +65,7 @@ const Login = () => {
       const { role } = response.data;
 
       // FIXED: correct route
-      if (role === "PM") navigate("/pmDashboard");
+      if (role === "PM") navigate("/pmdashboard");
       else navigate("/tmDashboard");
     } catch (error) {
       console.error("Login error:", error);
