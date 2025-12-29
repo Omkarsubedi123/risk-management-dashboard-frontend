@@ -9,7 +9,6 @@ const EditProject = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Initial project passed from Project Details page
   const initialProject = location.state?.project || null;
 
   const [form, setForm] = useState({
@@ -28,6 +27,9 @@ const EditProject = () => {
     variant: "success",
   });
 
+  const getToken = () =>
+    localStorage.getItem("access") || sessionStorage.getItem("access");
+
   useEffect(() => {
     if (initialProject) {
       setForm({
@@ -40,23 +42,18 @@ const EditProject = () => {
     } else {
       fetchProject();
     }
-  }, [initialProject, id]);
-
-  const getToken = () =>
-    localStorage.getItem("access") || sessionStorage.getItem("access");
+    // eslint-disable-next-line
+  }, [id]);
 
   const fetchProject = async () => {
     try {
       const token = getToken();
       const res = await axios.get(
         `http://127.0.0.1:8000/api/projects/${id}/`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       const p = res.data;
-
       setForm({
         name: p.name || "",
         sector: p.sector || "",
@@ -64,7 +61,7 @@ const EditProject = () => {
         description: p.description || "",
         status: p.status || "active",
       });
-    } catch (err) {
+    } catch {
       setMsgCfg({
         title: "Error",
         message: "Unable to load project.",
@@ -87,20 +84,23 @@ const EditProject = () => {
       await axios.patch(
         `http://127.0.0.1:8000/api/projects/${id}/`,
         form,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       setMsgCfg({
         title: "Saved",
-        message: "Project updated successfully.",
+        message: "Project updated successfully. Redirecting…",
         variant: "success",
       });
       setMsgOpen(true);
 
-      setTimeout(() => navigate(`/project/${id}`), 2000);
-    } catch (err) {
+      // ✅ CORRECT ROUTE + SAFE DELAY
+      setTimeout(() => {
+        setMsgOpen(false);
+        navigate(`/projects/${id}`, { replace: true });
+      }, 1500);
+
+    } catch {
       setMsgCfg({
         title: "Error",
         message: "Failed to save changes.",
@@ -118,43 +118,15 @@ const EditProject = () => {
 
         {/* Back Button */}
         <div className="pd-top">
-          <button
-            onClick={() => navigate(-1)}
-            style={{
-              background: "#e8eef4",
-              padding: "10px 18px",
-              borderRadius: "10px",
-              fontSize: "15px",
-              fontWeight: 600,
-              color: "#2a3f54",
-              border: "none",
-              cursor: "pointer",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "6px",
-              transition: "all 0.25s ease",
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.background = "#cfd9e3";
-              e.target.style.color = "#1a2733";
-              e.target.style.transform = "translateX(-3px)";
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.background = "#e8eef4";
-              e.target.style.color = "#2a3f54";
-              e.target.style.transform = "translateX(0)";
-            }}
-          >
+          <button className="btn btn-light" onClick={handleCancel}>
             ← Back
           </button>
         </div>
 
-        <h2  style={{ padding: "8z``px 0" }} className="pd-title pt-5px">Edit Project</h2>
+        <h2 className="pd-title">Edit Project</h2>
 
         <div className="pd-form">
-
-          {/* Project Name */}
-          <label style={{ padding: "5px 0" }} className="pd-label pt-5px">Project Name</label>
+          <label className="pd-label">Project Name</label>
           <input
             name="name"
             value={form.name}
@@ -162,8 +134,7 @@ const EditProject = () => {
             className="pd-input"
           />
 
-          {/* Sector */}
-          <label className="pd-labels">Sector</label>
+          <label className="pd-label">Sector</label>
           <select
             name="sector"
             className="pd-select"
@@ -179,31 +150,25 @@ const EditProject = () => {
           </select>
 
           {form.sector === "Other" && (
-            <div className="mb-3">
+            <>
               <label className="pd-label">Specify Sector</label>
               <input
-                type="text"
                 name="otherSector"
-                className="pd-input"
-                placeholder="Enter custom sector"
                 value={form.otherSector}
                 onChange={handleChange}
+                className="pd-input"
               />
-            </div>
+            </>
           )}
 
-          {/* Description */}
-          <div className="mt-3">
-            <label className="pd-label">Description</label>
-            <textarea
-              name="description"
-              value={form.description}
-              onChange={handleChange}
-              className="pd-textarea"
-            />
-          </div>
+          <label className="pd-label">Description</label>
+          <textarea
+            name="description"
+            value={form.description}
+            onChange={handleChange}
+            className="pd-textarea"
+          />
 
-          {/* Status */}
           <label className="pd-label">Status</label>
           <select
             name="status"
@@ -217,36 +182,11 @@ const EditProject = () => {
           </select>
         </div>
 
-        {/* Action Buttons */}
         <div className="pd-actions">
-          {/* Cancel Button */}
-          <button
-            onClick={handleCancel}
-            disabled={loading}
-            style={{
-              background: "#d3d3d3",
-              padding: "10px 20px",
-              borderRadius: "8px",
-              fontSize: "15px",
-              fontWeight: 600,
-              color: "#333",
-              border: "none",
-              cursor: "pointer",
-              transition: "all 0.25s ease",
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.background = "#a9a9a9";
-              e.target.style.color = "#fff";
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.background = "#d3d3d3";
-              e.target.style.color = "#333";
-            }}
-          >
+          <button className="btn btn-outline" onClick={handleCancel}>
             Cancel
           </button>
 
-          {/* Save Button */}
           <button
             className="btn btn-primary"
             onClick={handleSave}
@@ -257,12 +197,13 @@ const EditProject = () => {
         </div>
       </div>
 
+      {/* ✅ Auto-close modal (no OK button needed) */}
       <MessageModal
         open={msgOpen}
         title={msgCfg.title}
         message={msgCfg.message}
         variant={msgCfg.variant}
-        onClose={() => setMsgOpen(false)}
+        autoClose
       />
     </div>
   );

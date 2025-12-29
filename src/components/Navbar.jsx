@@ -19,7 +19,7 @@ const AppNavbar = () =>{
           <Nav className="me-auto">
             <Nav.Link onClick={() => navigate("/pmdashboard")}>Dashboard</Nav.Link>
             <Nav.Link onClick={() => navigate("/projects")}>Projects</Nav.Link>
-            <Nav.Link onClick={() => navigate("/pm/risks")}>Risks</Nav.Link>
+            <Nav.Link onClick={() => navigate("/risks")}>Risks</Nav.Link>
             <Nav.Link onClick={() => navigate("/pm/heatmap")}>Heat Map</Nav.Link>
             <Nav.Link onClick={() => navigate("/pm/reports")}>Reports</Nav.Link>
           </Nav>
