@@ -1,0 +1,48 @@
+.team-page {
+  padding: 40px;
+  display: flex;
+  justify-content: center;
+}
+
+.team-card {
+  width: 100%;
+  max-width: 900px;
+  background: #fff;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.08);
+}
+
+.team-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.team-table {
+  width: 100%;
+  margin-top: 20px;
+  border-collapse: collapse;
+}
+
+.team-table th,
+.team-table td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-box {
+  background: #fff;
+  padding: 24px;
+  border-radius: 12px;
+  width: 400px;
+}

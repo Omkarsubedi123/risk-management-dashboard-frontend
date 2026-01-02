@@ -331,3 +331,48 @@
   padding: 0;
   font-weight: 600;
 }
+/* ================= TEAM MEMBERS CARD ================= */
+
+.pd-card h3 {
+  font-size: 18px;
+  color: #0f172a;
+}
+
+/* Team role badge override */
+.badge-pm {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.badge-tm {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+/* Invite button spacing */
+.pd-top .btn-primary {
+  font-size: 13px;
+  padding: 6px 12px;
+}
+
+/* ================= INVITE MODAL ================= */
+
+.pd-modal-body select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #e6eef8;
+  background: white;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+/* Modal footer buttons alignment */
+.pd-modal-footer .btn {
+  min-width: 90px;
+}
+
+/* Disable background scroll when modal open (optional) */
+body.modal-open {
+  overflow: hidden;
+}

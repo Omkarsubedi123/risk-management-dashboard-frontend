@@ -4,6 +4,7 @@ import axios from "axios";
 import MessageModal from "../components/MessageModal";
 import ConfirmModal from "../components/ConfirmModal";
 import "../styles/ProjectDetails.css";
+import TeamPreviewCard from "../components/TeamPreviewCard";
 
 const ProjectDetail = () => {
   const { id } = useParams();
@@ -30,15 +31,12 @@ const ProjectDetail = () => {
 
   useEffect(() => {
     loadData();
-    // eslint-disable-next-line
   }, [id]);
 
   const loadData = async () => {
     await Promise.all([fetchProject(), fetchRisks()]);
     setLoading(false);
   };
-
-  /* ================= PROJECT ================= */
 
   const fetchProject = async () => {
     try {
@@ -74,16 +72,15 @@ const ProjectDetail = () => {
     setConfirmOpen(false);
     try {
       const token = getToken();
-      await axios.delete(`http://127.0.0.1:8000/api/projects/${id}/`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.delete(
+        `http://127.0.0.1:8000/api/projects/${id}/`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       navigate("/projects");
     } catch {
       showMsg("Delete Failed", "Unable to delete project.", "error");
     }
   };
-
-  /* ================= RISKS ================= */
 
   const fetchRisks = async () => {
     try {
@@ -110,114 +107,115 @@ const ProjectDetail = () => {
 
   return (
     <div className="pd-page">
-    <div className="pd-container">
-      {/* ================= PROJECT CARD ================= */}
-      <div className="pd-card">
-        <button className="btn btn-light" onClick={() => navigate("/projects")}>
-          ← Back to Projects
-        </button>
+      <div className="pd-container">
 
-        <h2 className="pd-title">{project.name}</h2>
-        <p className="pd-sub">{project.sector}</p>
-        <p className="pd-desc">
-          {project.description || "No description provided."}
-        </p>
+        {/* PROJECT */}
+        <div className="pd-card">
+          <button className="btn btn-light" onClick={() => navigate("/projects")}>
+            ← Back to Projects
+          </button>
 
-        <div className="pd-grid">
-          <div className="pd-row">
-            <div className="pd-label">Status</div>
-            <select value={status} onChange={handleStatusChange}>
-              <option value="active">Active</option>
-              <option value="on_hold">On Hold</option>
-              <option value="completed">Completed</option>
-            </select>
+          <h2 className="pd-title">{project.name}</h2>
+          <p className="pd-sub">{project.sector}</p>
+          <p className="pd-desc">{project.description}</p>
+
+          <div className="pd-grid">
+            <div className="pd-row">
+              <div className="pd-label">Status</div>
+              <select value={status} onChange={handleStatusChange}>
+                <option value="active">Active</option>
+                <option value="on_hold">On Hold</option>
+                <option value="completed">Completed</option>
+              </select>
+            </div>
+            <div className="pd-row">
+              <div className="pd-label">Created</div>
+              <div>{new Date(project.created_at).toLocaleString()}</div>
+            </div>
+            <div className="pd-row">
+              <div className="pd-label">Updated</div>
+              <div>{new Date(project.updated_at).toLocaleString()}</div>
+            </div>
           </div>
 
-          <div className="pd-row">
-            <div className="pd-label">Created</div>
-            <div>{new Date(project.created_at).toLocaleString()}</div>
-          </div>
-
-          <div className="pd-row">
-            <div className="pd-label">Updated</div>
-            <div>{new Date(project.updated_at).toLocaleString()}</div>
+          <div className="pd-actions">
+            <button
+              className="btn btn-outline"
+              onClick={() =>
+                navigate(`/projects/${id}/edit`, { state: { project } })
+              }
+            >
+              ✏️ Edit Project
+            </button>
+            <button
+              className="btn btn-danger"
+              onClick={() => setConfirmOpen(true)}
+            >
+              🗑 Delete Project
+            </button>
           </div>
         </div>
 
-        <div className="pd-actions">
-          <button
-            className="btn btn-outline"
-            onClick={() =>
-              navigate(`/projects/${id}/edit`, { state: { project } })
-            }
-          >
-            ✏️ Edit Project
-          </button>
+        {/* RISKS */}
+        <div className="pd-card risk-card">
+          <div className="pd-top">
+            <h3>Project Risks</h3>
+            <button
+              className="btn btn-primary"
+              onClick={() => navigate(`/projects/${id}/risks/create`)}
+            >
+              ➕ Add Risk
+            </button>
+          </div>
 
-          <button
-            className="btn btn-danger"
-            onClick={() => setConfirmOpen(true)}
-          >
-            🗑 Delete Project
-          </button>
-        </div>
-      </div>
-
-      {/* ================= RISK LIST ================= */}
-      <div className="pd-card risk-card">
-        <div className="pd-top">
-          <h3>Project Risks</h3>
-          <button
-            className="btn btn-primary"
-            onClick={() => navigate(`/projects/${id}/risks/create`)}
-          >
-            ➕ Add Risk
-          </button>
-        </div>
-
-        {riskLoading ? (
-          <p>Loading risks…</p>
-        ) : risks.length === 0 ? (
-          <p className="pd-muted">No risks added yet.</p>
-        ) : (
-          <table className="pd-table">
-            <thead>
-              <tr>
-                <th>Title</th>
-                <th>Score</th>
-                <th>Level</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {risks.map((risk) => (
-                <tr key={risk.id}>
-                  <td>{risk.title}</td>
-                  <td>{risk.risk_score}</td>
-                  <td>
-                    <span
-                      className={`badge badge-${risk.risk_level?.toLowerCase()}`}
-                    >
-                      {risk.risk_level}
-                    </span>
-                  </td>
-                  <td>{risk.status}</td>
-                  <td>
-                    <button
-                      type="button"
-                      className="btn btn-link"
-                      onClick={() => navigate(`/risks/${risk.id}`,{state:{projectId:id}})}
-                    >
-                      View →
-                    </button>
-                  </td>
+          {riskLoading ? (
+            <p>Loading risks…</p>
+          ) : risks.length === 0 ? (
+            <p className="pd-muted">No risks added yet.</p>
+          ) : (
+            <table className="pd-table">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Score</th>
+                  <th>Level</th>
+                  <th>Status</th>
+                  <th>Action</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+              </thead>
+              <tbody>
+                {risks.map((risk) => (
+                  <tr key={risk.id}>
+                    <td>{risk.title}</td>
+                    <td>{risk.risk_score}</td>
+                    <td>
+                      <span className={`badge badge-${risk.risk_level?.toLowerCase()}`}>
+                        {risk.risk_level}
+                      </span>
+                    </td>
+                    <td>{risk.status}</td>
+                    <td>
+                      <button
+                        className="btn btn-link"
+                        onClick={() =>
+                          navigate(`/risks/${risk.id}`, {
+                            state: { projectId: id },
+                          })
+                        }
+                      >
+                        View →
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+
+        {/* TEAM PREVIEW */}
+        <TeamPreviewCard projectId={id} />
+
       </div>
 
       <MessageModal {...msgCfg} open={msgOpen} onClose={() => setMsgOpen(false)} />

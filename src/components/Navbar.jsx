@@ -7,7 +7,7 @@ const AppNavbar = () =>{
     const navigate = useNavigate();
 
     const handleLogout = () =>{
-        localStorage.clear();
+        localStorage.clear() || sessionStorage.clear();
         navigate("/login");
     }
     return(

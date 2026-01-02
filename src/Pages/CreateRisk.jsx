@@ -58,7 +58,7 @@ const CreateRisk = () => {
       });
 
       // ✅ SAFE REDIRECT
-      navigate(`/project/${id}`, { replace: true });
+      navigate(`/projects/${id}`, { replace: true });
 
     } catch (err) {
       console.error("Create risk error:", err.response?.data || err);

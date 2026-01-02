@@ -1,15 +1,20 @@
 import React, { useState } from "react";
 import axios from "axios";
-import AppNavbar from "../components/Navbar"; 
+import { useNavigate } from "react-router-dom";
+import AppNavbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
 const CreateProjects = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     sector: "",
     otherSector: "",
   });
+
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -20,6 +25,7 @@ const CreateProjects = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
       const token =
@@ -28,7 +34,8 @@ const CreateProjects = () => {
 
       if (!token) {
         alert("❌ Please login first.");
-        window.location.href = "/login";
+        navigate("/login");
+        return;
       }
 
       const payload = {
@@ -40,7 +47,7 @@ const CreateProjects = () => {
             : formData.sector,
       };
 
-      const response = await axios.post(
+      await axios.post(
         "http://127.0.0.1:8000/api/projects/",
         payload,
         {
@@ -51,17 +58,17 @@ const CreateProjects = () => {
         }
       );
 
+      // ✅ Success feedback
       alert("✅ Project created successfully!");
-      setFormData({
-        name: "",
-        description: "",
-        sector: "",
-        otherSector: "",
-      });
+
+      // ✅ Redirect to projects list
+      navigate("/projects", { replace: true });
 
     } catch (err) {
-      console.error("ERROR:", err.response ? err.response.data : err);
+      console.error("ERROR:", err.response?.data || err);
       alert("❌ Failed to create project.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -74,9 +81,7 @@ const CreateProjects = () => {
           className="card shadow-lg p-4"
           style={{
             width: "600px",
-            border: "1px solid rgba(0,0,0,0.1)",
             borderRadius: "15px",
-            backdropFilter: "blur(6px)",
           }}
         >
           <h3 className="text-center fw-bold mb-3">
@@ -90,7 +95,9 @@ const CreateProjects = () => {
           <form onSubmit={handleSubmit}>
             {/* Project Name */}
             <div className="mb-3">
-              <label className="form-label fw-semibold">Project Name</label>
+              <label className="form-label fw-semibold">
+                Project Name
+              </label>
               <input
                 type="text"
                 name="name"
@@ -104,7 +111,9 @@ const CreateProjects = () => {
 
             {/* Description */}
             <div className="mb-3">
-              <label className="form-label fw-semibold">Description</label>
+              <label className="form-label fw-semibold">
+                Description
+              </label>
               <textarea
                 name="description"
                 className="form-control"
@@ -112,12 +121,14 @@ const CreateProjects = () => {
                 placeholder="Brief project summary"
                 value={formData.description}
                 onChange={handleChange}
-              ></textarea>
+              />
             </div>
 
             {/* Sector */}
             <div className="mb-3">
-              <label className="form-label fw-semibold">Sector</label>
+              <label className="form-label fw-semibold">
+                Sector
+              </label>
               <select
                 name="sector"
                 className="form-select"
@@ -134,10 +145,12 @@ const CreateProjects = () => {
               </select>
             </div>
 
-            {/* Other Sector Field */}
+            {/* Other Sector */}
             {formData.sector === "Other" && (
               <div className="mb-3">
-                <label className="form-label fw-semibold">Specify Sector</label>
+                <label className="form-label fw-semibold">
+                  Specify Sector
+                </label>
                 <input
                   type="text"
                   name="otherSector"
@@ -155,13 +168,18 @@ const CreateProjects = () => {
               <button
                 type="submit"
                 className="btn btn-primary w-100 fw-semibold"
+                disabled={loading}
               >
-                Create Project
+                {loading ? "Creating..." : "Create Project"}
               </button>
 
-              <a href="/projects" className="btn btn-outline-secondary w-100">
+              <button
+                type="button"
+                className="btn btn-outline-secondary w-100"
+                onClick={() => navigate("/projects")}
+              >
                 Cancel
-              </a>
+              </button>
             </div>
           </form>
         </div>

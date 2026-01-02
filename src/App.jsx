@@ -16,6 +16,7 @@ import CreateRisk from './Pages/CreateRisk.jsx'
 import RiskDetails from "./Pages/RiskDetails.jsx";
 import RiskEdit from "./Pages/RiskEdit.jsx";
 import GlobalRiskList from './Pages/GlobalRiskList.jsx'
+import ProjectTeam from './Pages/ProjectTeam.jsx'
 
 
 function App() {
@@ -41,6 +42,7 @@ function App() {
       <Route path="/risks/:id" element={<RiskDetails />} />
       <Route path="/risks/:id/edit" element={<RiskEdit />} />
       <Route path="/risks" element={<GlobalRiskList />} />
+      <Route path="/projects/:id/team" element={<ProjectTeam />} />
     </Routes>
   )
 }
