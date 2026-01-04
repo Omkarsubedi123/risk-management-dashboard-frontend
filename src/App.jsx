@@ -12,7 +12,6 @@ import ProjectList from './Pages/ProjectList.jsx'
 import ProjectDetail from './Pages/ProjectDetail.jsx'
 import EditProject from './Pages/EditProject.jsx'
 import CreateRisk from './Pages/CreateRisk.jsx'
-// import RiskList from "./pages/risks/RiskList";
 import RiskDetails from "./Pages/RiskDetails.jsx";
 import RiskEdit from "./Pages/RiskEdit.jsx";
 import GlobalRiskList from './Pages/GlobalRiskList.jsx'
