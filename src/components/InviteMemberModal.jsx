@@ -1,23 +1,40 @@
 import React, { useState } from "react";
 import axios from "axios";
+import "./../styles/InviteMemberModal.css";
 
 const InviteMemberModal = ({ open, projectId, onClose, onSuccess }) => {
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState("TM");
+  const [role]  = useState("TM");
 
   const token =
     localStorage.getItem("access") || sessionStorage.getItem("access");
 
   if (!open) return null;
 
+  // const invite = async () => {
+  //   await axios.post(
+  //     `http://127.0.0.1:8000/api/projects/${projectId}/invite/`,
+  //     { email, role },
+  //     { headers: { Authorization: `Bearer ${token}` } }
+  //   );
+  //   onSuccess();
+  // };
   const invite = async () => {
-    await axios.post(
+  try {
+    const res = await axios.post(
       `http://127.0.0.1:8000/api/projects/${projectId}/invite/`,
       { email, role },
       { headers: { Authorization: `Bearer ${token}` } }
     );
-    onSuccess();
-  };
+
+    onSuccess(res.data.detail, "success");
+  } catch (err) {
+    onSuccess(
+      err.response?.data?.detail || "Failed to send invitation.",
+      "error"
+    );
+  }
+};
 
   return (
     <div className="modal-overlay">
@@ -30,9 +47,9 @@ const InviteMemberModal = ({ open, projectId, onClose, onSuccess }) => {
           onChange={(e) => setEmail(e.target.value)}
         />
 
-        <select value={role} onChange={(e) => setRole(e.target.value)}>
+        
+        <select value="TM" disabled>
           <option value="TM">Team Member</option>
-          <option value="PM">Project Manager</option>
         </select>
 
         <div className="modal-actions">

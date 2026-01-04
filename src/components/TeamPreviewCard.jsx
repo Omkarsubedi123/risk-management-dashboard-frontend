@@ -14,13 +14,13 @@ const TeamPreviewCard = ({ projectId }) => {
       .get(`http://127.0.0.1:8000/api/projects/${projectId}/members/`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((res) => setMembers(res.data.slice(0, 3)));
+      .then((res) => setMembers(res.data));
   }, [projectId]);
 
   return (
     <div className="pd-card">
       <div className="pd-top">
-        <h3>Project Team</h3>
+        <h3>Team Members</h3>
         <button
           className="btn btn-outline"
           onClick={() => navigate(`/projects/${projectId}/team`)}
@@ -32,15 +32,26 @@ const TeamPreviewCard = ({ projectId }) => {
       {members.length === 0 ? (
         <p className="pd-muted">No team members added yet.</p>
       ) : (
-        <ul className="team-preview-list">
-          {members.map((m) => (
-            <li key={m.id}>
-              <strong>{m.user?.full_name || "Member"}</strong>
-              <span>{m.user?.email}</span>
-              <span className="badge badge-medium">{m.role}</span>
-            </li>
-          ))}
-        </ul>
+        <table className="pd-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            {members.map((m) => (
+              <tr key={m.id}>
+                <td>{m.username}</td>
+                <td>
+                  <span className={`badge badge-${m.role.toLowerCase()}`}>
+                    {m.role}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
     </div>
   );

@@ -4,7 +4,7 @@ const TeamMembersCard = ({ member }) => {
   return (
     <div className="team-member-card">
       <div>
-        <h4>{member.full_name}</h4>
+        <h4>{member.username}</h4>
         <p>{member.email}</p>
       </div>
 
