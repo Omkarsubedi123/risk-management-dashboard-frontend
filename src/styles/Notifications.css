@@ -1,0 +1,142 @@
+.notif-wrap {
+  position: relative;
+  margin-right: 10px;
+}
+
+.notif-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  text-decoration: none !important;
+  color: #e5e7eb !important;
+}
+
+.notif-toggle:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff !important;
+}
+
+.notif-bell {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.notif-badge {
+  position: absolute;
+  top: 0px;
+  right: 2px;
+  font-size: 11px;
+  padding: 3px 6px;
+  background: #ef4444 !important;
+  border: 2px solid #111827;
+}
+
+.notif-menu {
+  width: 360px;
+  padding: 0;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  box-shadow: 0 16px 40px rgba(2, 6, 23, 0.25);
+}
+
+.notif-head {
+  padding: 12px 14px;
+  background: linear-gradient(90deg, #0b1220, #111827);
+  color: #fff;
+}
+
+.notif-title {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.notif-sub {
+  opacity: 0.85;
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.notif-list {
+  max-height: 360px;
+  overflow: auto;
+  background: #fff;
+}
+
+.notif-empty {
+  padding: 16px;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.notif-item {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 12px 14px;
+  border-bottom: 1px solid #f1f5f9;
+  cursor: pointer;
+}
+
+.notif-item:hover {
+  background: #f8fafc;
+}
+
+.notif-item.unread {
+  background: #eef2ff;
+}
+
+.notif-item.read .notif-item-title {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.notif-item.unread .notif-item-title {
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.notif-item-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.notif-item-time {
+  font-size: 11px;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+.notif-item-msg {
+  font-size: 13px;
+  color: #334155;
+  line-height: 1.35;
+}
+
+.notif-foot {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px 12px;
+  background: #fff;
+}
+
+.notif-refresh {
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.notif-refresh:hover {
+  background: #eef2f7;
+}

@@ -11,14 +11,6 @@ const InviteMemberModal = ({ open, projectId, onClose, onSuccess }) => {
 
   if (!open) return null;
 
-  // const invite = async () => {
-  //   await axios.post(
-  //     `http://127.0.0.1:8000/api/projects/${projectId}/invite/`,
-  //     { email, role },
-  //     { headers: { Authorization: `Bearer ${token}` } }
-  //   );
-  //   onSuccess();
-  // };
   const invite = async () => {
   try {
     const res = await axios.post(

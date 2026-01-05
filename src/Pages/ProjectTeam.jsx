@@ -121,18 +121,6 @@ const ProjectTeam = () => {
         </table>
       </div>
 
-      {/* INVITE MODAL */}
-      {/* <InviteMemberModal
-        open={inviteOpen}
-        projectId={id}
-        onClose={() => setInviteOpen(false)}
-        onSuccess={() => {
-          setInviteOpen(false);
-          fetchMembers();
-          showMsg("Invited", "Invitation sent successfully.");
-        }}
-      /> */}
-
       <InviteMemberModal
   open={inviteOpen}
   projectId={id}

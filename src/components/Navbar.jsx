@@ -2,16 +2,18 @@ import React from "react";
 import { Navbar, Nav, Container, Dropdown } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import "./../styles/Navbar.css";
+import Notifications from "./Notifications"; 
 
-const AppNavbar = () =>{
-    const navigate = useNavigate();
+const AppNavbar = () => {
+  const navigate = useNavigate();
 
-    const handleLogout = () =>{
-        localStorage.clear() || sessionStorage.clear();
-        navigate("/login");
-    }
-    return(
-        <Navbar bg="dark" variant="dark" expand="lg" className="py-3 shadow-sm">
+  const handleLogout = () => {
+    localStorage.clear() || sessionStorage.clear();
+    navigate("/login");
+  };
+
+  return (
+    <Navbar bg="dark" variant="dark" expand="lg" className="py-3 shadow-sm">
       <Container fluid>
         <Navbar.Brand className="fw-bold ms-3">Risk Management</Navbar.Brand>
         <Navbar.Toggle aria-controls="navbar-nav" />
@@ -23,18 +25,24 @@ const AppNavbar = () =>{
             <Nav.Link onClick={() => navigate("/pm/heatmap")}>Heat Map</Nav.Link>
             <Nav.Link onClick={() => navigate("/pm/reports")}>Reports</Nav.Link>
           </Nav>
-          <Dropdown align="end" className="me-3">
-            <Dropdown.Toggle variant="outline-light" id="dropdown-user">
-              James Smith
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
-              <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
+
+          {/* ✅ RIGHT SIDE */}
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <Notifications />
+
+            <Dropdown align="end" className="me-3">
+              <Dropdown.Toggle variant="outline-light" id="dropdown-user">
+                James Smith
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+          </div>
         </Navbar.Collapse>
       </Container>
     </Navbar>
   );
-}
+};
 
 export default AppNavbar;
