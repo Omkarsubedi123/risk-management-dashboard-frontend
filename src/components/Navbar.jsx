@@ -24,6 +24,8 @@ const AppNavbar = () => {
             <Nav.Link onClick={() => navigate("/risks")}>Risks</Nav.Link>
             <Nav.Link onClick={() => navigate("/pm/heatmap")}>Heat Map</Nav.Link>
             <Nav.Link onClick={() => navigate("/pm/reports")}>Reports</Nav.Link>
+            {/* <Nav.Link as={Link} to="/pm/reports">Reports</Nav.Link> */}
+
           </Nav>
 
           {/* ✅ RIGHT SIDE */}

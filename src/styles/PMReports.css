@@ -1,0 +1,240 @@
+/* =========================
+   PM Reports (Professional)
+   ========================= */
+
+/* Global helpers */
+:root {
+  --pmr-bg: #f6f8fc;
+  --pmr-card: #ffffff;
+  --pmr-border: #e7eefc;
+  --pmr-text: #0f172a;
+  --pmr-muted: #64748b;
+
+  --pmr-primary: #2563eb;
+
+  /* Severity colors (your request) */
+  --sev-high: #ef4444;     /* red */
+  --sev-medium: #d97706;   /* dark yellow/amber */
+  --sev-low: #16a34a;      /* green */
+}
+
+/* Page background (optional – makes it feel premium) */
+body {
+  background: var(--pmr-bg);
+}
+
+/* ===== Header ===== */
+.pmr-header {
+  background: linear-gradient(135deg, #0f172a, #1e3a8a);
+  padding: 20px 0;
+  color: #fff;
+}
+
+.pmr-header-content {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.pmr-title {
+  margin: 0;
+  font-weight: 900;
+  letter-spacing: 0.2px;
+}
+
+.pmr-subtitle {
+  margin: 6px 0 0;
+  opacity: 0.95;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+/* ===== Buttons ===== */
+.pmr-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.pmr-btn {
+  border: none;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.12s ease, opacity 0.12s ease, box-shadow 0.12s ease;
+}
+
+.pmr-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.pmr-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(15, 23, 42, 0.12);
+}
+
+.pmr-btn-primary {
+  background: var(--pmr-primary);
+  color: #ffffff;
+}
+
+.pmr-btn-primary:hover:not(:disabled) {
+  opacity: 0.95;
+}
+
+.pmr-btn-ghost {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* ===== Card ===== */
+.pmr-card {
+  background: var(--pmr-card);
+  border: 1px solid var(--pmr-border);
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+}
+
+.pmr-card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.pmr-card-title {
+  margin: 0;
+  font-weight: 900;
+  color: var(--pmr-text);
+}
+
+.pmr-card-sub {
+  margin: 6px 0 0;
+  color: var(--pmr-muted);
+  font-weight: 600;
+}
+
+.pmr-inline-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #475569;
+  font-weight: 800;
+}
+
+/* ===== Fields ===== */
+.pmr-field {
+  background: #ffffff;
+  border: 1px solid var(--pmr-border);
+  border-radius: 14px;
+  padding: 14px;
+}
+
+.pmr-label {
+  display: block;
+  font-weight: 900;
+  color: var(--pmr-text);
+  margin-bottom: 8px;
+}
+
+.pmr-input {
+  width: 100%;
+  border: 1px solid #dbe5ff;
+  border-radius: 12px;
+  padding: 10px 12px;
+  outline: none;
+  background: #fff;
+  font-weight: 700;
+}
+
+.pmr-input:focus {
+  border-color: var(--pmr-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
+}
+
+.pmr-help {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--pmr-muted);
+  font-weight: 600;
+}
+
+.pmr-loading-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  color: var(--pmr-muted);
+  font-weight: 700;
+}
+
+/* ===== Footer ===== */
+.pmr-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-top: 14px;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--pmr-border);
+  padding-top: 14px;
+}
+
+.pmr-footer-note {
+  color: var(--pmr-muted);
+  font-weight: 700;
+}
+
+.pmr-footer-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+/* =========================
+   Severity styling helpers
+   (use these classes in UI if you want badges)
+   ========================= */
+
+.sev-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 12px;
+}
+
+.sev-high {
+  background: rgba(239, 68, 68, 0.14);
+  color: var(--sev-high);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.sev-medium {
+  background: rgba(217, 119, 6, 0.14);
+  color: var(--sev-medium);
+  border: 1px solid rgba(217, 119, 6, 0.25);
+}
+
+.sev-low {
+  background: rgba(22, 163, 74, 0.14);
+  color: var(--sev-low);
+  border: 1px solid rgba(22, 163, 74, 0.25);
+}
+
+/* =========================
+   PDF chart colors + visibility note
+   =========================
+   CSS cannot change ReportLab PDF chart colors.
+   To make line chart more visible in PDF:
+   - increase strokeWidth (e.g., 3)
+   - use darker strokeColor
+   - add markers if needed
+   (I can give you that exact backend patch next.)
+*/
