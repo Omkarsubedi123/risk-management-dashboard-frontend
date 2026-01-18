@@ -1,0 +1,114 @@
+/* src/styles/createProject.css */
+
+.cp-header {
+  background: linear-gradient(90deg, #0b1320 0%, #10244a 45%, #1f3fa6 100%);
+  padding: 28px 0 22px;
+  color: #fff;
+}
+
+.cp-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+}
+
+.cp-title {
+  margin: 0;
+  font-weight: 900;
+  letter-spacing: 0.2px;
+  font-size: 34px;
+  line-height: 1.1;
+}
+
+.cp-subtitle {
+  margin: 6px 0 0 0;
+  opacity: 0.9;
+  font-size: 15px;
+}
+
+.cp-back-btn {
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 800;
+}
+
+/* container spacing */
+.cp-container {
+  max-width: 900px;
+  margin-top: 28px;
+  margin-bottom: 50px;
+}
+
+/* form card */
+.cp-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+  padding: 22px;
+}
+
+.cp-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+.cp-card-title {
+  margin: 0;
+  font-weight: 900;
+}
+
+.cp-card-hint {
+  margin: 0;
+  font-size: 12px;
+  color: #6c757d;
+  font-weight: 600;
+}
+
+/* inputs */
+.cp-input {
+  border-radius: 12px !important;
+  padding: 11px 12px;
+}
+
+/* buttons row */
+.cp-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.cp-submit {
+  flex: 1;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-weight: 800;
+}
+
+.cp-cancel {
+  flex: 1;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-weight: 800;
+}
+
+/* responsive */
+@media (max-width: 768px) {
+  .cp-header-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .cp-actions {
+    flex-direction: column;
+  }
+
+  .cp-container {
+    margin-top: 18px;
+  }
+}

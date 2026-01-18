@@ -1,177 +1,442 @@
+/* src/styles/RiskDetails.css */
+
+/* =========================
+   PAGE
+========================= */
 .rd-page {
-  background: #f8fafc;
   min-height: 100vh;
-  padding: 24px;
+  padding: 22px 16px 60px;
+  background: linear-gradient(180deg, #f4f7fb 0%, #ffffff 100%);
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 
+/* Back button styled like your theme */
 .rd-back {
-  border: none;
-  background: none;
-  color: #2563eb;
-  font-weight: 600;
-  margin-bottom: 12px;
+  max-width: 1100px;
+  margin: 0 auto 12px;
+  border: 1px solid rgba(37, 99, 235, 0.22);
+  background: rgba(37, 99, 235, 0.06);
+  color: #1d4ed8;
+  font-weight: 900;
+  border-radius: 12px;
+  padding: 10px 14px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
-/* ===== CARD ===== */
+.rd-back:hover {
+  background: rgba(37, 99, 235, 0.10);
+}
+
+/* Loading */
+.rd-loading {
+  padding: 80px;
+  text-align: center;
+  color: #334155;
+  font-weight: 800;
+}
+
+/* =========================
+   MAIN CARD
+========================= */
 .rd-card.unified {
   max-width: 1100px;
-  margin: auto;
-  background: white;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  box-shadow: 0 14px 40px rgba(17, 24, 39, 0.10);
+  overflow: hidden; /* allows hero header feel */
+  position: relative;
 }
 
-/* ===== HEADER ===== */
+/* Risk level accent strip */
+.rd-card.unified.low {
+  border-left: 0;
+}
+.rd-card.unified.medium {
+  border-left: 0;
+}
+.rd-card.unified.high {
+  border-left: 0;
+}
+
+.rd-card.unified.low::after,
+.rd-card.unified.medium::after,
+.rd-card.unified.high::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 6px;
+  height: 100%;
+  opacity: 0.9;
+}
+.rd-card.unified.low::after {
+  background: #16a34a;
+}
+.rd-card.unified.medium::after {
+  background: #f97316;
+}
+.rd-card.unified.high::after {
+  background: #dc2626;
+}
+
+/* Inner padding (since card is overflow hidden) */
+.rd-card.unified > * {
+  padding-left: 22px;
+  padding-right: 22px;
+}
+
+/* =========================
+   HEADER (SUPERB HERO STYLE)
+========================= */
 .rd-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding-bottom: 16px;
-  border-bottom: 1px solid #e5e7eb;
+  padding-top: 22px;
+  padding-bottom: 18px;
+
+  /* gradient hero like Reports */
+  background: linear-gradient(90deg, #0b1320 0%, #10244a 45%, #1f3fa6 100%);
+  color: #ffffff;
+
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 14px;
+  align-items: start;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
+/* Title */
+.rd-header h2 {
+  margin: 0 0 8px;
+  font-size: 34px;
+  font-weight: 950;
+  letter-spacing: 0.2px;
+  line-height: 1.1;
+}
+
+/* sub text inside hero */
 .rd-sub {
-  font-size: 14px;
-  color: #64748b;
+  margin: 4px 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 650;
 }
 
+/* right side in hero */
 .rd-header-right {
   text-align: right;
+  min-width: 240px;
 }
 
+/* Badge */
 .rd-badge {
-  display: inline-block;
-  padding: 6px 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
   border-radius: 999px;
-  font-weight: 700;
-  margin-bottom: 8px;
+  font-weight: 950;
+  font-size: 12px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.12);
 }
 
-/* ===== TABLE STYLE ===== */
+/* Keep your existing .low/.medium/.high classes working */
+.rd-badge.low {
+  border-color: rgba(34, 197, 94, 0.55);
+}
+.rd-badge.medium {
+  border-color: rgba(245, 158, 11, 0.55);
+}
+.rd-badge.high {
+  border-color: rgba(239, 68, 68, 0.55);
+}
+
+.rd-header-right p {
+  margin: 6px 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.rd-header-right strong {
+  font-weight: 950;
+}
+
+/* =========================
+   DETAILS GRID (like info cards)
+========================= */
 .rd-table {
+  padding-top: 18px;
+  padding-bottom: 6px;
+
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 14px 40px;
-  padding: 20px 0;
+  gap: 12px 18px;
 }
 
+/* Each row becomes a mini-card */
 .rd-row {
   display: flex;
   justify-content: space-between;
-  padding-bottom: 6px;
-  border-bottom: 1px dashed #e5e7eb;
+  align-items: center;
+
+  padding: 12px 14px;
+  border-radius: 14px;
+
+  background: #f8fafc;
+  border: 1px solid rgba(15, 23, 42, 0.06);
 }
 
 .rd-row span:first-child {
   color: #64748b;
-  font-weight: 600;
+  font-weight: 900;
+  font-size: 12px;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
 }
 
-/* ===== LOSS ===== */
+.rd-row span:last-child {
+  color: #0f172a;
+  font-weight: 850;
+  font-size: 14px;
+}
+
+/* =========================
+   LOSS ROW (strong highlight)
+========================= */
 .rd-loss-row {
-  display: flex;
-  justify-content: space-between;
-  background: #f9fafb;
-  padding: 16px;
-  border-radius: 12px;
-  margin-top: 8px;
+  margin-top: 10px;
+  padding: 14px;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+
+  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 16px;
 }
 
-.rd-loss-amount {
-  font-size: 18px;
-  font-weight: 800;
-  color: #dc2626;
-}
-
-/* ===== DESCRIPTION ===== */
-.rd-desc-block {
-  margin-top: 18px;
-}
-
-.rd-desc-block h4 {
+.rd-loss-row label {
+  display: block;
+  color: #64748b;
+  font-weight: 900;
+  font-size: 12px;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
   margin-bottom: 6px;
 }
 
-/* ===== ACTIONS ===== */
-.rd-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 20px;
+.rd-loss-row p {
+  margin: 0;
+  color: #0f172a;
+  font-weight: 950;
+  font-size: 16px;
 }
 
-/* ===== RISK COLORS ===== */
-.low {
-  border-left: 6px solid #16a34a;
-}
-.medium {
-  border-left: 6px solid #f97316;
-}
-.high {
-  border-left: 6px solid #dc2626;
+.rd-loss-amount {
+  font-size: 18px !important;
+  font-weight: 950 !important;
+  color: #dc2626 !important;
 }
 
-.rd-badge.low {
-  background: #dcfce7;
-}
-.rd-badge.medium {
-  background: #ffedd5;
-}
-.rd-badge.high {
-  background: #fee2e2;
-}
-/* ===== MITIGATION ===== */
-.rd-mitigation {
-  margin-top: 24px;
+/* =========================
+   DESCRIPTION (nice section)
+========================= */
+.rd-desc-block {
+  margin-top: 16px;
   padding: 16px;
+
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 16px;
+
+  box-shadow: 0 10px 24px rgba(17, 24, 39, 0.06);
+}
+
+.rd-desc-block h4 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 950;
+  color: #0f172a;
+}
+
+.rd-desc-block p {
+  margin: 0;
+  color: #475569;
+  line-height: 1.65;
+  font-weight: 600;
+}
+
+/* =========================
+   MITIGATION (premium block)
+========================= */
+.rd-mitigation {
+  margin-top: 16px;
+  padding: 16px;
+
   background: #f8fafc;
-  border-radius: 12px;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 16px;
 }
 
 .rd-mitigation-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
+.rd-mitigation-header h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 950;
+  color: #0f172a;
+}
+
+/* Textarea */
 .rd-mitigation textarea {
   width: 100%;
-  min-height: 120px;
-  padding: 10px;
-  margin-top: 8px;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  min-height: 130px;
+  padding: 12px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: #ffffff;
+  outline: none;
+  font-weight: 600;
+  color: #0f172a;
+  transition: box-shadow 160ms ease, border-color 160ms ease;
 }
 
+.rd-mitigation textarea:focus {
+  border-color: rgba(37, 99, 235, 0.55);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+/* select */
 .rd-mitigation select {
+  width: 100%;
+  height: 46px;
   margin-top: 10px;
-  padding: 8px;
-  border-radius: 8px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: #ffffff;
+  font-weight: 700;
+  outline: none;
 }
 
 .rd-mitigation-actions {
   display: flex;
+  justify-content: flex-end;
   gap: 10px;
-  margin-top: 10px;
+  margin-top: 12px;
+  flex-wrap: wrap;
 }
 
+/* Mitigation status pill */
 .rd-status {
-  display: inline-block;
-  margin-top: 8px;
-  padding: 4px 10px;
+  display: inline-flex;
+  margin-top: 10px;
+  padding: 6px 12px;
   border-radius: 999px;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 950;
+  border: 1px solid rgba(15, 23, 42, 0.12);
 }
 
 .rd-status.NotStarted {
-  background: #e5e7eb;
+  background: rgba(148, 163, 184, 0.18);
+  color: #334155;
 }
 .rd-status.InProgress {
-  background: #fde68a;
+  background: rgba(245, 158, 11, 0.20);
+  color: #92400e;
 }
 .rd-status.Completed {
-  background: #bbf7d0;
+  background: rgba(34, 197, 94, 0.18);
+  color: #166534;
+}
+
+/* =========================
+   ACTIONS
+========================= */
+.rd-actions {
+  margin-top: 18px;
+  padding-bottom: 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Buttons (scoped so you don’t affect other pages) */
+.rd-card .btn {
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 900;
+}
+
+.rd-card .btn-primary {
+  background: linear-gradient(90deg, #2563eb 0%, #1d4ed8 100%);
+  border: none;
+  color: #fff;
+  box-shadow: 0 10px 22px rgba(37, 99, 235, 0.18);
+}
+
+.rd-card .btn-outline {
+  background: transparent;
+  border: 1px solid rgba(37, 99, 235, 0.28);
+  color: #1d4ed8;
+}
+
+.rd-card .btn-danger {
+  background: linear-gradient(90deg, #ff6b6b 0%, #ef4444 100%);
+  border: none;
+  color: #fff;
+}
+
+/* Soft light button */
+.rd-card .btn-light {
+  background: #f8fafc;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  color: #0f172a;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 900px) {
+  .rd-header {
+    grid-template-columns: 1fr;
+  }
+
+  .rd-header-right {
+    text-align: left;
+    min-width: unset;
+  }
+
+  .rd-table {
+    grid-template-columns: 1fr;
+  }
+
+  .rd-loss-row {
+    grid-template-columns: 1fr;
+  }
+
+  .rd-actions,
+  .rd-mitigation-actions {
+    justify-content: stretch;
+  }
+
+  .rd-card .btn {
+    width: 100%;
+  }
 }

@@ -18,6 +18,7 @@ import GlobalRiskList from './Pages/GlobalRiskList.jsx'
 import ProjectTeam from './Pages/ProjectTeam.jsx'
 import PMHeatmap from './Pages/PMHeatmap.jsx'
 import PMReports from './Pages/PMReports.jsx'
+import Profile from './Pages/Profile.jsx'
 
 
 function App() {
@@ -46,6 +47,7 @@ function App() {
       <Route path="/projects/:id/team" element={<ProjectTeam />} />
       <Route path="/pm/heatmap" element={<PMHeatmap />} />
       <Route path="/pm/reports" element={<PMReports />} />
+      <Route path="/profile" element={<Profile />} /> 
     </Routes>
   )
 }

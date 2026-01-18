@@ -1,5 +1,5 @@
 // src/pages/ProjectList.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import AppNavbar from "../components/Navbar";
@@ -11,37 +11,33 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:8000";
 const ProjectList = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // UI states
+  const [search, setSearch] = useState("");
+  const [sector, setSector] = useState("all");
+
   const navigate = useNavigate();
 
-  // ✅ ALWAYS get token safely
   const getToken = () =>
     localStorage.getItem("access") || sessionStorage.getItem("access");
 
   useEffect(() => {
     const token = getToken();
-
-    // 🔐 HARD GUARD
     if (!token) {
       navigate("/login", { state: { forceLogin: true } });
       return;
     }
-
     fetchProjects(token);
+    // eslint-disable-next-line
   }, []);
 
   const fetchProjects = async (token) => {
     try {
       const response = await axios.get(`${backendUrl}/api/projects/`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
-
-      setProjects(response.data);
+      setProjects(response.data || []);
     } catch (error) {
-      console.error("Project fetch failed:", error);
-
-      // 🚨 TOKEN EXPIRED / INVALID
       if (error.response?.status === 401) {
         localStorage.clear();
         sessionStorage.clear();
@@ -52,43 +48,111 @@ const ProjectList = () => {
     }
   };
 
+  const sectors = useMemo(() => {
+    const set = new Set();
+    projects.forEach((p) => p.sector && set.add(p.sector));
+    return ["all", ...Array.from(set)];
+  }, [projects]);
+
+  const filteredProjects = useMemo(() => {
+    const q = search.toLowerCase();
+    return projects.filter((p) => {
+      const matchSearch =
+        !q ||
+        p.name?.toLowerCase().includes(q) ||
+        p.description?.toLowerCase().includes(q);
+
+      const matchSector = sector === "all" || p.sector === sector;
+      return matchSearch && matchSector;
+    });
+  }, [projects, search, sector]);
+
   return (
     <>
       <AppNavbar />
 
       <div className="project-page-wrapper">
-        <div className="container mt-4">
+        {/* ===== HEADER ===== */}
+        <div className="projects-header">
+          <div className="container">
+            <div className="projects-header-row">
+              <div>
+                <h1 className="projects-title">Projects</h1>
+                <p className="projects-subtitle">
+                  Browse and manage your projects
+                </p>
+              </div>
 
-          <div className="d-flex justify-content-between align-items-center mb-3">
-            <h3>Projects</h3>
-            <Link to="/create-project" className="btn btn-primary">
-              + Create Project
-            </Link>
+              <Link to="/create-project" className="btn btn-primary projects-cta">
+                + Create Project
+              </Link>
+            </div>
+
+            {/* ===== FILTER ROW ===== */}
+            <div className="projects-toolbar">
+              <div className="projects-search">
+                <span className="projects-search-icon"></span>
+                <input
+                  className="form-control projects-search-input"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search projects..."
+                />
+              </div>
+
+              <select
+                className="form-select projects-sector-select"
+                value={sector}
+                onChange={(e) => setSector(e.target.value)}
+              >
+                {sectors.map((s) => (
+                  <option key={s} value={s}>
+                    {s === "all" ? "All Sectors" : s}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="projects-meta">
+              <strong>
+                {loading ? "Loading..." : `${filteredProjects.length} project(s)`}
+              </strong>
+            </div>
           </div>
+        </div>
 
+        {/* ===== CONTENT ===== */}
+        <div className="container mt-4">
           {loading ? (
-            <p className="text-center text-muted">Loading projects...</p>
-          ) : projects.length === 0 ? (
-            <p className="text-muted">No projects found.</p>
+            <div className="projects-loading">
+              <div className="spinner-border" />
+            </div>
+          ) : filteredProjects.length === 0 ? (
+            <div className="projects-empty">
+              <h5>No projects found</h5>
+            </div>
           ) : (
             <div className="row">
-              {projects.map((project) => (
+              {filteredProjects.map((project) => (
                 <div key={project.id} className="col-md-4 mb-4">
-                  <div className="card shadow-sm project-card h-100">
+                  <div className="card project-card h-100">
                     <div className="card-body d-flex flex-column">
-                      <h5 className="card-title">{project.name}</h5>
+                      <div className="project-card-top">
+                        <h5 className="project-card-title">{project.name}</h5>
+                        <span className="project-sector-badge">
+                          {project.sector || "N/A"}
+                        </span>
+                      </div>
 
-                      <p className="text-muted small">{project.sector}</p>
-
-                      <p className="card-text flex-grow-1">
+                      <p className="project-card-desc flex-grow-1">
                         {project.description
-                          ? project.description.substring(0, 100) + "..."
-                          : "No description provided."}
+                          ? project.description.slice(0, 120)
+                          : "No description"}
                       </p>
 
                       <Link
                         to={`/projects/${project.id}`}
-                        className="btn btn-outline-primary btn-sm mt-auto"
+                        className="btn btn-outline-primary btn-sm"
                       >
                         View Details →
                       </Link>
