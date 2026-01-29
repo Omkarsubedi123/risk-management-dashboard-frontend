@@ -11,3 +11,22 @@
   color: #fff !important;
   text-decoration: underline;
 }
+
+/* ✅ active link style */
+.nav-active {
+  color: #fff !important;
+  font-weight: 700;
+  position: relative;
+}
+
+.nav-active::after {
+  content: "";
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 2px;
+  height: 2px;
+  background: #ffffff;
+  opacity: 0.7;
+  border-radius: 999px;
+}
