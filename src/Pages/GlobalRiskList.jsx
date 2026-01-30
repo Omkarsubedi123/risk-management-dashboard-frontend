@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import "../styles/GlobalRiskList.css";
+import PendingRiskApprovals from "../components/PendingRiskApprovals";
 
 const GlobalRiskList = () => {
   const navigate = useNavigate();
@@ -25,16 +26,17 @@ const GlobalRiskList = () => {
   const fetchRisks = async () => {
     const token = getToken();
 
+    // ✅ send only non-empty filters
     const params = Object.fromEntries(
       Object.entries(filters).filter(([_, v]) => v)
     );
 
     const res = await axios.get("http://127.0.0.1:8000/api/risks/global/", {
       headers: { Authorization: `Bearer ${token}` },
-      params: filters,
+      params, // ✅ FIXED (was params: filters)
     });
 
-    setRisks(res.data);
+    setRisks(res.data || []);
   };
 
   return (
@@ -42,14 +44,19 @@ const GlobalRiskList = () => {
       <Navbar />
 
       <div className="gr-container">
+        {/* Header */}
         <div className="gr-header">
           <h2>Global Risk Register</h2>
           <p>Centralized view of risks across all projects</p>
         </div>
 
+        {/* ✅ Pending approvals should be here (between header and filters) */}
+        <PendingRiskApprovals />
+
         {/* Filters */}
         <div className="gr-filters">
           <select
+            value={filters.risk_level}
             onChange={(e) =>
               setFilters({ ...filters, risk_level: e.target.value })
             }
@@ -61,9 +68,8 @@ const GlobalRiskList = () => {
           </select>
 
           <select
-            onChange={(e) =>
-              setFilters({ ...filters, status: e.target.value })
-            }
+            value={filters.status}
+            onChange={(e) => setFilters({ ...filters, status: e.target.value })}
           >
             <option value="">Status</option>
             <option value="Open">Open</option>
@@ -72,11 +78,9 @@ const GlobalRiskList = () => {
           </select>
 
           <select
+            value={filters.mitigation_status}
             onChange={(e) =>
-              setFilters({
-                ...filters,
-                mitigation_status: e.target.value,
-              })
+              setFilters({ ...filters, mitigation_status: e.target.value })
             }
           >
             <option value="">Mitigation</option>
@@ -84,6 +88,16 @@ const GlobalRiskList = () => {
             <option value="InProgress">In Progress</option>
             <option value="Completed">Completed</option>
           </select>
+
+          {/* Optional: quick reset */}
+          <button
+            className="view-btn"
+            onClick={() =>
+              setFilters({ risk_level: "", status: "", mitigation_status: "" })
+            }
+          >
+            Reset
+          </button>
         </div>
 
         {/* Table */}
@@ -107,9 +121,7 @@ const GlobalRiskList = () => {
                   <td>{r.title}</td>
                   <td>{r.project_name}</td>
                   <td>
-                    <span className={`badge ${r.risk_level}`}>
-                      {r.risk_level}
-                    </span>
+                    <span className={`badge ${r.risk_level}`}>{r.risk_level}</span>
                   </td>
                   <td>{r.risk_score}</td>
                   <td>{r.status}</td>
@@ -124,6 +136,14 @@ const GlobalRiskList = () => {
                   </td>
                 </tr>
               ))}
+
+              {risks.length === 0 && (
+                <tr>
+                  <td colSpan="7" style={{ textAlign: "center", padding: "18px" }}>
+                    No risks found.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

@@ -1,0 +1,112 @@
+/* src/styles/TMCreateRisk.css */
+
+.tmcr-page {
+  min-height: calc(100vh - 60px);
+  padding: 24px 16px 60px;
+  background: linear-gradient(180deg, #f4f7fb 0%, #ffffff 100%);
+}
+
+.tmcr-card {
+  max-width: 900px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 18px;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  box-shadow: 0 14px 40px rgba(17, 24, 39, 0.10);
+  padding: 18px;
+}
+
+.tmcr-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  margin-bottom: 14px;
+}
+
+.tmcr-sub {
+  margin: 6px 0 0;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.tmcr-back {
+  border-radius: 12px;
+  font-weight: 850;
+}
+
+.tmcr-error {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #991b1b;
+  padding: 10px 12px;
+  border-radius: 14px;
+  font-weight: 750;
+  margin-bottom: 12px;
+}
+
+.tmcr-form {
+  display: grid;
+  gap: 12px;
+}
+
+.tmcr-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 900;
+  color: #64748b;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.tmcr-group input,
+.tmcr-group textarea,
+.tmcr-group select {
+  width: 100%;
+  border-radius: 14px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  padding: 11px 12px;
+  font-weight: 650;
+  outline: none;
+  transition: box-shadow 160ms ease, border-color 160ms ease;
+  background: #fff;
+}
+
+.tmcr-group input:focus,
+.tmcr-group textarea:focus,
+.tmcr-group select:focus {
+  border-color: rgba(37, 99, 235, 0.55);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+.tmcr-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.tmcr-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.tmcr-actions .btn {
+  border-radius: 12px;
+  font-weight: 900;
+  padding: 10px 14px;
+}
+
+@media (max-width: 768px) {
+  .tmcr-row {
+    grid-template-columns: 1fr;
+  }
+  .tmcr-actions .btn {
+    width: 100%;
+  }
+}

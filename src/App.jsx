@@ -21,6 +21,7 @@ import PMReports from './Pages/PMReports.jsx'
 import Profile from './Pages/Profile.jsx'
 import TMProjects from "./Pages/TMProjects";
 import TMRisks from "./Pages/TMRisks";
+import TMCreateRisk from "./Pages/TMCreateRisk";
 
 
 
@@ -54,6 +55,8 @@ function App() {
       <Route path="/profile" element={<Profile />} />
       <Route path="/tm/projects" element={<TMProjects />} />
       <Route path="/tm/risks" element={<TMRisks />} />
+      <Route path="/tm/risks/create" element={<TMCreateRisk />} />
+
     </Routes>
   )
 }
