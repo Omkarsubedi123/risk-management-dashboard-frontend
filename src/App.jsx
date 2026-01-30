@@ -20,6 +20,8 @@ import PMHeatmap from './Pages/PMHeatmap.jsx'
 import PMReports from './Pages/PMReports.jsx'
 import Profile from './Pages/Profile.jsx'
 import TMProjects from "./Pages/TMProjects";
+import TMRisks from "./Pages/TMRisks";
+
 
 
 
@@ -51,6 +53,7 @@ function App() {
       <Route path="/pm/reports" element={<PMReports />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/tm/projects" element={<TMProjects />} />
+      <Route path="/tm/risks" element={<TMRisks />} />
     </Routes>
   )
 }
