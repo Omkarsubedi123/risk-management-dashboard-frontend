@@ -35,6 +35,38 @@
   padding: 10px 14px;
 }
 
+/* ✅ Tabs (Option B) */
+.tmrisks-tabs {
+  margin-top: 14px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.tmrisks-tab {
+  background: rgba(255,255,255,0.16);
+  border: 1px solid rgba(255,255,255,0.22);
+  color: #fff;
+  font-weight: 900;
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: transform 0.12s ease, opacity 0.12s ease, background 0.12s ease;
+}
+
+.tmrisks-tab:hover {
+  transform: translateY(-1px);
+  opacity: 0.95;
+}
+
+.tmrisks-tab.active {
+  background: #ffffff;
+  color: #0f172a;
+  opacity: 1;
+}
+
+/* Toolbar */
 .tmrisks-toolbar {
   margin-top: 16px;
   display: grid;
@@ -76,6 +108,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .tmrisks-count {
@@ -155,6 +189,40 @@
   font-size: 13px;
 }
 
+/* ✅ Approval badge row */
+.tmrisks-approval-row {
+  margin-top: 10px;
+}
+
+.tmrisks-approval-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 950;
+  border: 1px solid transparent;
+}
+
+.approval-pending {
+  background: rgba(245,158,11,0.18);
+  color: #92400e;
+  border-color: rgba(245,158,11,0.28);
+}
+
+.approval-approved {
+  background: rgba(34,197,94,0.16);
+  color: #166534;
+  border-color: rgba(34,197,94,0.24);
+}
+
+.approval-rejected {
+  background: rgba(239,68,68,0.14);
+  color: #991b1b;
+  border-color: rgba(239,68,68,0.24);
+}
+
 .tmrisks-desc {
   margin-top: 10px;
   color: #64748b;
@@ -202,6 +270,18 @@
 .status-notstarted { background: rgba(148,163,184,0.16); color:#334155; border-color: rgba(148,163,184,0.22); }
 .status-inprogress { background: rgba(245,158,11,0.18); color:#92400e; border-color: rgba(245,158,11,0.26); }
 .status-completed { background: rgba(34,197,94,0.16); color:#166534; border-color: rgba(34,197,94,0.22); }
+
+/* ✅ Trash info */
+.tmrisks-trash-info {
+  margin-top: 10px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #991b1b;
+  background: rgba(239,68,68,0.12);
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(239,68,68,0.18);
+}
 
 .tmrisks-actions {
   margin-top: 14px;

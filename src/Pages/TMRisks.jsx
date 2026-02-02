@@ -18,6 +18,9 @@ const TMRisks = () => {
   const [level, setLevel] = useState("all");
   const [mitigation, setMitigation] = useState("all");
 
+  // ✅ NEW: Tab state (Option B)
+  const [tab, setTab] = useState("active"); // active | pending | trash
+
   const getToken = () =>
     localStorage.getItem("access") || sessionStorage.getItem("access");
 
@@ -36,15 +39,36 @@ const TMRisks = () => {
         return;
       }
 
-      const url = projectFilter
-        ? `${backendUrl}/api/risks/my/?project=${encodeURIComponent(projectFilter)}`
-        : `${backendUrl}/api/risks/my/`;
+      let url = "";
+
+      // ✅ Trash uses special endpoint
+      if (tab === "trash") {
+        url = projectFilter
+          ? `${backendUrl}/api/risks/trash/?project=${encodeURIComponent(
+              projectFilter
+            )}`
+          : `${backendUrl}/api/risks/trash/`;
+      } else {
+        // ✅ My risks endpoint
+        url = projectFilter
+          ? `${backendUrl}/api/risks/my/?project=${encodeURIComponent(projectFilter)}`
+          : `${backendUrl}/api/risks/my/`;
+      }
 
       const res = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      setRisks(res.data || []);
+      let data = res.data || [];
+
+      // ✅ Split Active vs Pending client-side (safe even if backend changes later)
+      if (tab === "active") {
+        data = data.filter((r) => r.approval_status === "approved");
+      } else if (tab === "pending") {
+        data = data.filter((r) => r.approval_status === "pending");
+      } // trash already contains only rejected from backend
+
+      setRisks(data);
     } catch (err) {
       console.error("Failed to load TM risks:", err.response?.data || err);
       if (err.response?.status === 401) {
@@ -58,9 +82,10 @@ const TMRisks = () => {
   };
 
   useEffect(() => {
+    setLoading(true);
     fetchMyRisks();
     // eslint-disable-next-line
-  }, [projectFilter]);
+  }, [projectFilter, tab]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -83,6 +108,27 @@ const TMRisks = () => {
     });
   }, [risks, search, level, mitigation]);
 
+  const getTabTitle = () => {
+    if (tab === "active") return "Active Risks";
+    if (tab === "pending") return "Pending Approval";
+    return "Trash";
+  };
+
+  const getEmptyText = () => {
+    if (tab === "active")
+      return "No active risks found (approved risks will appear here).";
+    if (tab === "pending")
+      return "No pending risks found (TM submitted risks waiting for PM approval).";
+    return "Trash is empty (rejected risks will appear here and auto delete after 15 days).";
+  };
+
+  const calcAutoDeleteDate = (rejectedAt) => {
+    if (!rejectedAt) return null;
+    const d = new Date(rejectedAt);
+    const auto = new Date(d.getTime() + 15 * 24 * 60 * 60 * 1000);
+    return auto.toLocaleDateString();
+  };
+
   return (
     <>
       <AppNavbar />
@@ -96,6 +142,28 @@ const TMRisks = () => {
               <p className="tmrisks-subtitle">
                 Track your assigned risks and mitigation progress.
               </p>
+
+              {/* ✅ Tabs (Option B) */}
+              <div className="tmrisks-tabs">
+                <button
+                  className={`tmrisks-tab ${tab === "active" ? "active" : ""}`}
+                  onClick={() => setTab("active")}
+                >
+                  Active
+                </button>
+                <button
+                  className={`tmrisks-tab ${tab === "pending" ? "active" : ""}`}
+                  onClick={() => setTab("pending")}
+                >
+                  Pending
+                </button>
+                <button
+                  className={`tmrisks-tab ${tab === "trash" ? "active" : ""}`}
+                  onClick={() => setTab("trash")}
+                >
+                  Trash
+                </button>
+              </div>
             </div>
 
             <button
@@ -117,7 +185,7 @@ const TMRisks = () => {
                 className="form-control tmrisks-search-input"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search by risk title, project, description..."
+                placeholder={`Search in ${getTabTitle()}...`}
               />
             </div>
 
@@ -148,21 +216,22 @@ const TMRisks = () => {
 
           <div className="tmrisks-meta">
             <span className="tmrisks-count">
-              {loading ? "Loading..." : `${filtered.length} risk(s)`}
+              {loading ? "Loading..." : `${filtered.length} risk(s) • ${getTabTitle()}`}
             </span>
 
-            {(search.trim() || level !== "all" || mitigation !== "all") && !loading && (
-              <button
-                className="btn btn-outline-light btn-sm tmrisks-clear"
-                onClick={() => {
-                  setSearch("");
-                  setLevel("all");
-                  setMitigation("all");
-                }}
-              >
-                Clear filters
-              </button>
-            )}
+            {(search.trim() || level !== "all" || mitigation !== "all") &&
+              !loading && (
+                <button
+                  className="btn btn-outline-light btn-sm tmrisks-clear"
+                  onClick={() => {
+                    setSearch("");
+                    setLevel("all");
+                    setMitigation("all");
+                  }}
+                >
+                  Clear filters
+                </button>
+              )}
           </div>
         </div>
       </div>
@@ -178,9 +247,7 @@ const TMRisks = () => {
           <div className="tmrisks-empty">
             <div className="tmrisks-empty-icon">🧾</div>
             <h5>No risks found</h5>
-            <p className="text-muted">
-              You have no assigned risks (or nothing matches your filters).
-            </p>
+            <p className="text-muted">{getEmptyText()}</p>
           </div>
         ) : (
           <div className="tmrisks-grid">
@@ -188,13 +255,30 @@ const TMRisks = () => {
               <div key={r.id} className="tmrisks-card">
                 <div className="tmrisks-card-top">
                   <div className="tmrisks-card-title">{r.title}</div>
-                  <span className={`tmrisks-badge level-${(r.risk_level || "").toLowerCase()}`}>
+
+                  {/* Risk Level */}
+                  <span
+                    className={`tmrisks-badge level-${(r.risk_level || "").toLowerCase()}`}
+                  >
                     {r.risk_level || "N/A"}
                   </span>
                 </div>
 
                 <div className="tmrisks-project">
                   Project: <strong>{r.project_name}</strong>
+                </div>
+
+                {/* Approval badge */}
+                <div className="tmrisks-approval-row">
+                  <span
+                    className={`tmrisks-approval-badge approval-${(r.approval_status || "").toLowerCase()}`}
+                  >
+                    {r.approval_status === "pending"
+                      ? "Pending Approval"
+                      : r.approval_status === "approved"
+                      ? "Approved"
+                      : "Rejected"}
+                  </span>
                 </div>
 
                 <div className="tmrisks-desc">
@@ -205,12 +289,22 @@ const TMRisks = () => {
                     : "No description"}
                 </div>
 
+                {/* Trash info */}
+                {tab === "trash" && (
+                  <div className="tmrisks-trash-info">
+                    🗑️ Auto deletes on{" "}
+                    <strong>{calcAutoDeleteDate(r.rejected_at) || "—"}</strong>
+                  </div>
+                )}
+
                 <div className="tmrisks-chips">
                   <span className="tmrisks-chip">
                     Score: <strong>{r.risk_score}</strong>
                   </span>
 
-                  <span className={`tmrisks-chip status-${(r.mitigation_status || "").toLowerCase()}`}>
+                  <span
+                    className={`tmrisks-chip status-${(r.mitigation_status || "").toLowerCase()}`}
+                  >
                     {r.mitigation_status}
                   </span>
 
@@ -219,24 +313,31 @@ const TMRisks = () => {
                   </span>
                 </div>
 
-                <div className="tmrisks-actions">
-                  <button
-                    className="btn btn-outline-primary btn-sm"
-                    onClick={() =>
-                      navigate(`/risks/${r.id}`, { state: { projectId: r.project_id } })
-                    }
-                  >
-                    Open Risk Board →
-                  </button>
+                {/* Actions hidden in Trash */}
+                {tab !== "trash" && (
+                  <div className="tmrisks-actions">
+                    <button
+                      className="btn btn-outline-primary btn-sm"
+                      onClick={() =>
+                        navigate(`/risks/${r.id}`, {
+                          state: { projectId: r.project_id },
+                        })
+                      }
+                    >
+                      Open Risk Board →
+                    </button>
 
-                  <button
-                    className="btn btn-primary btn-sm"
-                    onClick={() => navigate(`/tm/risks/create?project=${r.project_id}`)}
-                    title="Report another risk for this project"
-                  >
-                    + Add Risk
-                  </button>
-                </div>
+                    <button
+                      className="btn btn-primary btn-sm"
+                      onClick={() =>
+                        navigate(`/tm/risks/create?project=${r.project_id}`)
+                      }
+                      title="Report another risk for this project"
+                    >
+                      + Add Risk
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
           </div>
