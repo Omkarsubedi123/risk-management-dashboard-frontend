@@ -319,9 +319,7 @@ const TMRisks = () => {
                     <button
                       className="btn btn-outline-primary btn-sm"
                       onClick={() =>
-                        navigate(`/risks/${r.id}`, {
-                          state: { projectId: r.project_id },
-                        })
+                        navigate(`/tm/risks/${r.id}`)
                       }
                     >
                       Open Risk Board →
