@@ -6,6 +6,9 @@ import AppNavbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import "../styles/RiskDetails.css";
 
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:8000";
 
 const RiskDetails = () => {
@@ -54,6 +57,8 @@ const RiskDetails = () => {
         localStorage.clear();
         sessionStorage.clear();
         navigate("/login", { state: { forceLogin: true } });
+      } else {
+        toast.error(e?.response?.data?.detail || "Failed to load risk details.");
       }
     } finally {
       setLoading(false);
@@ -105,7 +110,7 @@ const RiskDetails = () => {
     return hasSuggestion && suggestionStatus === "pending";
   }, [hasSuggestion, suggestionStatus]);
 
-  // --- URLs (change only if needed) ---
+  // --- URLs ---
   const mitigationPatchUrl = `${backendUrl}/api/risks/${id}/mitigation/`;
   const approveSuggestionUrl = `${backendUrl}/api/risks/${id}/approve-suggestion/`;
   const rejectSuggestionUrl = `${backendUrl}/api/risks/${id}/reject-suggestion/`;
@@ -126,9 +131,10 @@ const RiskDetails = () => {
 
       await fetchRisk();
       setEditMode(false);
+      toast.success("Mitigation saved successfully.");
     } catch (e) {
       console.error("Failed to save mitigation:", e?.response?.data || e);
-      alert(e?.response?.data?.detail || "Failed to save mitigation.");
+      toast.error(e?.response?.data?.detail || "Failed to save mitigation.");
     } finally {
       setSaving(false);
     }
@@ -146,10 +152,10 @@ const RiskDetails = () => {
       );
 
       await fetchRisk();
-      alert("Suggestion approved and applied.");
+      toast.success("Suggestion approved and applied.");
     } catch (e) {
       console.error("Approve suggestion failed:", e?.response?.data || e);
-      alert(e?.response?.data?.detail || "Failed to approve suggestion.");
+      toast.error(e?.response?.data?.detail || "Failed to approve suggestion.");
     } finally {
       setProcessingSuggestion(false);
     }
@@ -167,23 +173,29 @@ const RiskDetails = () => {
       );
 
       await fetchRisk();
-      alert("Suggestion rejected.");
+      toast.info("Suggestion rejected.");
     } catch (e) {
       console.error("Reject suggestion failed:", e?.response?.data || e);
-      alert(e?.response?.data?.detail || "Failed to reject suggestion.");
+      toast.error(e?.response?.data?.detail || "Failed to reject suggestion.");
     } finally {
       setProcessingSuggestion(false);
     }
   };
 
   const handleDelete = async () => {
-    const token = getToken();
-    await axios.delete(`${backendUrl}/api/risks/${id}/`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    navigate(projectId ? `/projects/${projectId}` : "/projects", {
-      replace: true,
-    });
+    try {
+      const token = getToken();
+      await axios.delete(`${backendUrl}/api/risks/${id}/`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      toast.success("Risk deleted.");
+      navigate(projectId ? `/projects/${projectId}` : "/projects", {
+        replace: true,
+      });
+    } catch (e) {
+      console.error("Delete failed:", e?.response?.data || e);
+      toast.error(e?.response?.data?.detail || "Failed to delete risk.");
+    }
   };
 
   const goBack = () => {
@@ -193,6 +205,9 @@ const RiskDetails = () => {
   return (
     <>
       <AppNavbar />
+
+      {/* ✅ Toast container (kept inside page so it's drop-in) */}
+      <ToastContainer position="top-right" autoClose={2500} pauseOnHover />
 
       <div className="pmrd-wrap">
         {loading ? (
@@ -247,13 +262,11 @@ const RiskDetails = () => {
               </div>
             </div>
 
-            {/* INFO BANNER (like your TM) */}
             <div className="alert alert-success pmrd-alert">
               ✅ You are viewing this risk as <strong>Project Manager</strong>. You can update mitigation and review TM
               suggestions below.
             </div>
 
-            {/* MAIN GRID */}
             <div className="pmrd-grid">
               {/* LEFT: DETAILS */}
               <div className="pmrd-card">
@@ -272,9 +285,7 @@ const RiskDetails = () => {
 
                   <div className="pmrd-info">
                     <div className="pmrd-info-label">Assigned To</div>
-                    <div className="pmrd-info-value">
-                      {risk.assigned_to_name || "Not Assigned"}
-                    </div>
+                    <div className="pmrd-info-value">{risk.assigned_to_name || "Not Assigned"}</div>
                   </div>
 
                   <div className="pmrd-info">
@@ -304,9 +315,7 @@ const RiskDetails = () => {
                   </div>
                   <div className="pmrd-loss-box">
                     <div className="pmrd-loss-label">Estimated Loss</div>
-                    <div className="pmrd-loss-value loss-red">
-                      ₹{estimatedLoss.toLocaleString()}
-                    </div>
+                    <div className="pmrd-loss-value loss-red">₹{estimatedLoss.toLocaleString()}</div>
                   </div>
                 </div>
 
@@ -330,7 +339,6 @@ const RiskDetails = () => {
                   </button>
                 </div>
 
-                {/* PM plan display */}
                 <div className="pmrd-field">
                   <label className="pmrd-label">PM Mitigation Plan</label>
                   {editMode ? (
@@ -382,7 +390,6 @@ const RiskDetails = () => {
                   </div>
                 )}
 
-                {/* TM suggestion panel */}
                 <div className="pmrd-suggest">
                   <div className="pmrd-suggest-top">
                     <div>
@@ -431,12 +438,8 @@ const RiskDetails = () => {
                   )}
                 </div>
 
-                {/* PM actions */}
                 <div className="pmrd-bottom-actions">
-                  <button
-                    className="btn btn-outline-secondary"
-                    onClick={goBack}
-                  >
+                  <button className="btn btn-outline-secondary" onClick={goBack}>
                     ← Back
                   </button>
 
@@ -454,7 +457,6 @@ const RiskDetails = () => {
               </div>
             </div>
 
-            {/* footer small */}
             <div className="pmrd-bottom">
               <button className="btn btn-outline-secondary" onClick={goBack}>
                 ← Back to Project

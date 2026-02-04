@@ -12,7 +12,6 @@ const TMProjects = () => {
 
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const [search, setSearch] = useState("");
 
   const getToken = () =>
@@ -65,7 +64,6 @@ const TMProjects = () => {
     <>
       <AppNavbar />
 
-      {/* Header (same style as PM pages) */}
       <div className="tmprojects-header">
         <div className="container tmprojects-container">
           <div className="tmprojects-header-row">
@@ -95,6 +93,7 @@ const TMProjects = () => {
             <span className="tmprojects-count">
               {loading ? "Loading..." : `${filtered.length} project(s)`}
             </span>
+
             {!loading && search.trim() && (
               <button
                 className="btn btn-outline-light tmprojects-clear"
@@ -119,60 +118,66 @@ const TMProjects = () => {
               📁
             </div>
             <h5>No projects found</h5>
-            <p className="text-muted">
-              You are not assigned to any projects yet.
-            </p>
+            <p className="text-muted">You are not assigned to any projects yet.</p>
           </div>
         ) : (
           <div className="row">
-            {filtered.map((p) => (
-              <div key={p.id} className="col-md-4 mb-4">
-                <div className="tmprojects-card h-100">
-                  <div className="tmprojects-card-top">
-                    <h5 className="tmprojects-card-title">{p.name}</h5>
-                    <span className="tmprojects-sector">{p.sector}</span>
-                  </div>
+            {filtered.map((p) => {
+              const statusKey = (p.status || "active")
+                .toString()
+                .toLowerCase()
+                .replace(/\s+/g, "-");
 
-                  <p className="tmprojects-desc">
-                    {p.description
-                      ? p.description.length > 120
-                        ? p.description.slice(0, 120) + "..."
-                        : p.description
-                      : "No description provided."}
-                  </p>
-
-                  <div className="tmprojects-info">
-                    <div className="tmprojects-chip">
-                      👥 Team: <strong>{p.team_count}</strong>
+              return (
+                <div key={p.id} className="col-md-4 mb-4">
+                  <div className="tmprojects-card h-100">
+                    <div className="tmprojects-card-top">
+                      <h5 className="tmprojects-card-title">{p.name}</h5>
+                      <span className="tmprojects-sector">{p.sector}</span>
                     </div>
-                    <div className="tmprojects-chip">
-                      🧑‍💼 PM: <strong>{p.pm_email || "N/A"}</strong>
-                    </div>
-                    <div className={`tmprojects-status status-${p.status}`}>
-                      {p.status}
-                    </div>
-                  </div>
 
-                  <div className="tmprojects-actions">
-                    <button
-                      className="btn btn-outline-primary btn-sm"
-                      onClick={() => navigate(`/projects/${p.id}`)}
-                      title="Open Project"
-                    >
-                      Open →
-                    </button>
+                    <p className="tmprojects-desc">
+                      {p.description
+                        ? p.description.length > 120
+                          ? p.description.slice(0, 120) + "..."
+                          : p.description
+                        : "No description provided."}
+                    </p>
 
-                    <button
-                      className="btn btn-primary btn-sm"
-                      onClick={() => navigate(`/tm/risks?project=${p.id}`)}
-                      title="View your risks in this project"
-                    >
-                      My Risks →
-                    </button>
+                    <div className="tmprojects-info">
+                      <div className="tmprojects-chip">
+                        👥 Team: <strong>{p.team_count ?? 0}</strong>
+                      </div>
+                      <div className="tmprojects-chip">
+                        🧑‍💼 PM: <strong>{p.pm_email || "N/A"}</strong>
+                      </div>
+                      <div className={`tmprojects-status status-${statusKey}`}>
+                        {p.status || "Active"}
+                      </div>
+                    </div>
+
+                    <div className="tmprojects-actions">
+                      {/* ✅ FIXED: use p.id (not projects.id) */}
+                      <button
+                        className="btn btn-outline-primary btn-sm"
+                        onClick={() => navigate(`/tm/projects/${p.id}`)}
+                        title="Open Project"
+                      >
+                        Open →
+                      </button>
+
+                      <button
+                        className="btn btn-primary btn-sm"
+                        onClick={() => navigate(`/tm/risks?project=${p.id}`)}
+                        title="View your risks in this project"
+                      >
+                        My Risks →
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

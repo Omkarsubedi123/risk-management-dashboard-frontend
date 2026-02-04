@@ -22,7 +22,9 @@ import Profile from './Pages/Profile.jsx'
 import TMProjects from "./Pages/TMProjects";
 import TMRisks from "./Pages/TMRisks";
 import TMCreateRisk from "./Pages/TMCreateRisk";
-import TMRiskDetails from "./pages/TMRiskDetails";
+import TMRiskDetails from "./Pages/TMRiskDetails";
+import TMProjectDetail from "./Pages/TMProjectDetails.jsx";
+
 
 function App() {
   const [count, setCount] = useState(0)
@@ -55,6 +57,7 @@ function App() {
       <Route path="/tm/risks" element={<TMRisks />} />
       <Route path="/tm/risks/create" element={<TMCreateRisk />} />
       <Route path="/tm/risks/:id" element={<TMRiskDetails />} />
+      <Route path="/tm/projects/:id" element={<TMProjectDetail />} />
 
 
     </Routes>

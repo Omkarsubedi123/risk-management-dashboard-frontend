@@ -5,6 +5,9 @@ import AppNavbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import "../styles/TMRiskDetails.css";
 
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:8000";
 
 const TMRiskDetails = () => {
@@ -15,7 +18,7 @@ const TMRiskDetails = () => {
   const [loading, setLoading] = useState(true);
 
   const [saving, setSaving] = useState(false);
-  const [editMode, setEditMode] = useState(false); // now controls TM suggestion edit (not PM mitigation)
+  const [editMode, setEditMode] = useState(false); // controls TM suggestion edit
 
   const getToken = () =>
     localStorage.getItem("access") || sessionStorage.getItem("access");
@@ -24,7 +27,6 @@ const TMRiskDetails = () => {
   const tmSuggestionStatus = (risk?.tm_suggestion_status || "").toLowerCase();
 
   const canSuggest = useMemo(() => {
-    // TM can suggest only when risk is approved
     if (!risk) return false;
     return approvalStatus === "approved";
   }, [risk, approvalStatus]);
@@ -48,6 +50,8 @@ const TMRiskDetails = () => {
         localStorage.clear();
         sessionStorage.clear();
         navigate("/login", { state: { forceLogin: true } });
+      } else {
+        toast.error(err?.response?.data?.detail || "Failed to load risk details.");
       }
     } finally {
       setLoading(false);
@@ -70,10 +74,10 @@ const TMRiskDetails = () => {
 
   const submitSuggestion = async () => {
     if (!canSuggest) return;
-    const suggestionText = (risk?.tm_mitigation_suggestion || "").trim();
 
+    const suggestionText = (risk?.tm_mitigation_suggestion || "").trim();
     if (!suggestionText) {
-      alert("Suggestion cannot be empty.");
+      toast.warning("Suggestion cannot be empty.");
       return;
     }
 
@@ -87,12 +91,12 @@ const TMRiskDetails = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      // re-fetch to get updated status (pending) from backend
       await fetchRiskDetails();
       setEditMode(false);
+      toast.success("Suggestion sent to PM.");
     } catch (err) {
       console.error("Failed to submit suggestion:", err.response?.data || err);
-      alert(err.response?.data?.detail || "Failed to submit suggestion.");
+      toast.error(err?.response?.data?.detail || "Failed to submit suggestion.");
     } finally {
       setSaving(false);
     }
@@ -109,6 +113,9 @@ const TMRiskDetails = () => {
   return (
     <>
       <AppNavbar />
+
+      {/* ✅ Toast container */}
+      <ToastContainer position="top-right" autoClose={2500} pauseOnHover />
 
       <div className="tmrd-wrap">
         {loading ? (
@@ -128,7 +135,6 @@ const TMRiskDetails = () => {
           </div>
         ) : (
           <div className="container tmrd-container">
-            {/* Header */}
             <div className="tmrd-hero">
               <div>
                 <h1 className="tmrd-title">{risk.title}</h1>
@@ -144,9 +150,7 @@ const TMRiskDetails = () => {
               </div>
 
               <div className="tmrd-hero-right">
-                <span
-                  className={`tmrd-pill level-${(risk.risk_level || "").toLowerCase()}`}
-                >
+                <span className={`tmrd-pill level-${(risk.risk_level || "").toLowerCase()}`}>
                   {risk.risk_level || "N/A"} Risk
                 </span>
 
@@ -165,7 +169,6 @@ const TMRiskDetails = () => {
               </div>
             </div>
 
-            {/* Approval banner */}
             {approvalStatus === "pending" && (
               <div className="alert alert-warning tmrd-alert">
                 ⏳ This risk is <strong>pending PM approval</strong>. Mitigation
@@ -187,9 +190,7 @@ const TMRiskDetails = () => {
               </div>
             )}
 
-            {/* Main grid */}
             <div className="tmrd-grid">
-              {/* Details card */}
               <div className="tmrd-card">
                 <div className="tmrd-card-title">Details</div>
 
@@ -211,9 +212,7 @@ const TMRiskDetails = () => {
                   <div className="tmrd-info">
                     <div className="tmrd-info-label">Approval</div>
                     <div className="tmrd-info-value">
-                      <span
-                        className={`tmrd-approval approval-${approvalStatus || "approved"}`}
-                      >
+                      <span className={`tmrd-approval approval-${approvalStatus || "approved"}`}>
                         {approvalStatus || "approved"}
                       </span>
                     </div>
@@ -230,13 +229,10 @@ const TMRiskDetails = () => {
 
                 <div className="tmrd-section">
                   <div className="tmrd-section-title">Description</div>
-                  <div className="tmrd-desc">
-                    {risk.description || "No description provided."}
-                  </div>
+                  <div className="tmrd-desc">{risk.description || "No description provided."}</div>
                 </div>
               </div>
 
-              {/* Mitigation card (UPDATED WORKFLOW) */}
               <div className="tmrd-card">
                 <div className="tmrd-card-top">
                   <div className="tmrd-card-title">Mitigation</div>
@@ -245,18 +241,13 @@ const TMRiskDetails = () => {
                     className="btn btn-outline-primary btn-sm tmrd-editbtn"
                     onClick={() => setEditMode((p) => !p)}
                     disabled={!canSuggest}
-                    title={
-                      canSuggest
-                        ? "Write / edit your suggestion"
-                        : "Suggestions are disabled until approved"
-                    }
+                    title={canSuggest ? "Write / edit your suggestion" : "Suggestions are disabled until approved"}
                   >
                     ✏️ {editMode ? "Close" : "Suggest"}
                   </button>
                 </div>
 
                 <div className="tmrd-mitigation">
-                  {/* PM mitigation (read-only) */}
                   <div className="tmrd-field">
                     <label className="tmrd-label">PM Mitigation Plan</label>
                     <div className="tmrd-readonly">
@@ -273,7 +264,6 @@ const TMRiskDetails = () => {
 
                   <div className="tmrd-divider" />
 
-                  {/* TM suggestion + status */}
                   <div className="tmrd-field">
                     <div className="tmrd-label-row">
                       <label className="tmrd-label">Your Mitigation Suggestion</label>
@@ -300,21 +290,15 @@ const TMRiskDetails = () => {
                     />
 
                     {tmSuggestionStatus === "approved" && (
-                      <div className="tmrd-hint">
-                        ✅ Your suggestion was approved and applied by PM.
-                      </div>
+                      <div className="tmrd-hint">✅ Your suggestion was approved and applied by PM.</div>
                     )}
 
                     {tmSuggestionStatus === "rejected" && (
-                      <div className="tmrd-hint">
-                        ❌ Your suggestion was rejected. You can edit and submit again.
-                      </div>
+                      <div className="tmrd-hint">❌ Your suggestion was rejected. You can edit and submit again.</div>
                     )}
 
                     {tmSuggestionStatus === "pending" && (
-                      <div className="tmrd-hint">
-                        ⏳ Your suggestion is pending PM review.
-                      </div>
+                      <div className="tmrd-hint">⏳ Your suggestion is pending PM review.</div>
                     )}
                   </div>
 
@@ -327,7 +311,6 @@ const TMRiskDetails = () => {
                       className="btn btn-primary"
                       onClick={submitSuggestion}
                       disabled={!editMode || !canSuggest || saving}
-                      title={!canSuggest ? "Wait for PM approval first" : "Submit to PM"}
                     >
                       {saving ? "Submitting..." : "Submit Suggestion"}
                     </button>
@@ -342,12 +325,8 @@ const TMRiskDetails = () => {
               </div>
             </div>
 
-            {/* Footer row */}
             <div className="tmrd-bottom">
-              <button
-                className="btn btn-outline-secondary"
-                onClick={() => navigate(-1)}
-              >
+              <button className="btn btn-outline-secondary" onClick={() => navigate(-1)}>
                 ← Back to Risks
               </button>
             </div>
