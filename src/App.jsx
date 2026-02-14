@@ -25,6 +25,8 @@ import TMCreateRisk from "./Pages/TMCreateRisk";
 import TMRiskDetails from "./Pages/TMRiskDetails";
 import TMProjectDetail from "./Pages/TMProjectDetails.jsx";
 import TMDashboard from "./Pages/TMDashboard.jsx";
+import TMReport from "./Pages/TMReport.jsx";
+
 
 
 function App() {
@@ -60,6 +62,7 @@ function App() {
       <Route path="/tm/risks/:id" element={<TMRiskDetails />} />
       <Route path="/tm/projects/:id" element={<TMProjectDetail />} />
       <Route path="/tm/dashboard" element={<TMDashboard />} />
+      <Route path="/tm/report" element={<TMReport />} />
 
 
 

@@ -27,7 +27,7 @@ const Login = () => {
 
     if (access && role && !location.state?.forceLogin) {
       if (role === "PM") navigate("/pmdashboard");
-      else navigate("/tmdashboard");
+      else navigate("/tm/dashboard");
     }
   }, []);
 
@@ -66,7 +66,7 @@ const Login = () => {
 
       // FIXED: correct route
       if (role === "PM") navigate("/pmdashboard");
-      else navigate("/tmDashboard");
+      else navigate("/tm/dashboard");
     } catch (error) {
       console.error("Login error:", error);
 

@@ -51,8 +51,12 @@ const TMDashboard = () => {
 
     try {
       const [projRes, riskRes] = await Promise.all([
-        axios.get(`${backendUrl}/api/projects/`, { headers }).catch(() => ({ data: [] })),
-        axios.get(`${backendUrl}/api/risks/`, { headers }).catch(() => ({ data: [] })),
+        axios
+          .get(`${backendUrl}/api/projects/`, { headers })
+          .catch(() => ({ data: [] })),
+        axios
+          .get(`${backendUrl}/api/risks/`, { headers })
+          .catch(() => ({ data: [] })),
       ]);
 
       setProjects(Array.isArray(projRes.data) ? projRes.data : []);
@@ -81,8 +85,6 @@ const TMDashboard = () => {
   }, [risks, selectedProject]);
 
   const filteredProjectsCount = useMemo(() => {
-    // For "All Projects" show total projects.
-    // If a project is selected, count becomes 1 (because we are focusing that project).
     if (selectedProject === "all") return projects.length;
     return 1;
   }, [projects, selectedProject]);
@@ -142,15 +144,13 @@ const TMDashboard = () => {
           usePointStyle: false,
         },
       },
-      tooltip: {
-        enabled: true,
-      },
+      tooltip: { enabled: true },
     },
     cutout: "62%",
   };
 
   // ---------------------------
-  // Trend chart (PM-like Monthly: High/Medium/Low + hover)
+  // Trend chart (Monthly: High/Medium/Low)
   // ---------------------------
   const monthKey = (iso) => {
     if (!iso) return null;
@@ -199,7 +199,7 @@ const TMDashboard = () => {
         }
       }
     } else {
-      // if no data -> show last 6 months zero lines (so chart looks stable)
+      // if no data -> show last 6 months zero lines
       const now = new Date();
       for (let i = 5; i >= 0; i--) {
         const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
@@ -263,6 +263,7 @@ const TMDashboard = () => {
     ],
   };
 
+  // ✅ improved options so it looks like your screenshot (clean, nice grid)
   const trendOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -287,13 +288,48 @@ const TMDashboard = () => {
       y: {
         beginAtZero: true,
         ticks: { precision: 0 },
-        grid: { drawBorder: false },
+        grid: { color: "rgba(148, 163, 184, 0.35)" },
       },
       x: {
-        grid: { drawBorder: false },
+        grid: { color: "rgba(148, 163, 184, 0.12)" },
       },
     },
   };
+
+  // ---------------------------
+  // Risk Table Helpers
+  // ---------------------------
+  const projectNameById = useMemo(() => {
+    const map = {};
+    projects.forEach((p) => {
+      map[String(p.id)] = p.name;
+    });
+    return map;
+  }, [projects]);
+
+  const formatStatus = (r) => {
+    const st = (r.approval_status || "").toString().toLowerCase();
+    if (st === "approved") return "Approved";
+    if (st === "rejected") return "Rejected";
+    if (st === "pending") return "Pending";
+    return "—";
+  };
+
+  const formatLevel = (r) => {
+    const lvl = (r.risk_level || "").toString().toLowerCase();
+    if (lvl === "high") return "High";
+    if (lvl === "medium") return "Medium";
+    return "Low";
+  };
+
+  const tableRisks = useMemo(() => {
+    const sorted = [...filteredRisks].sort((a, b) => {
+      const da = a.created_at || a.updated_at;
+      const db = b.created_at || b.updated_at;
+      return new Date(db || 0).getTime() - new Date(da || 0).getTime();
+    });
+    return sorted;
+  }, [filteredRisks]);
 
   // ---------------------------
   // UI
@@ -352,7 +388,7 @@ const TMDashboard = () => {
         <div className="container tmd-container">
           {err ? <div className="alert alert-warning">{err}</div> : null}
 
-          {/* Cards (PM-style spacing & sizing) */}
+          {/* Cards */}
           <div className="tmd-cards">
             <div className="tmd-card tmd-left-green">
               <div className="tmd-card-top">
@@ -417,6 +453,83 @@ const TMDashboard = () => {
               <div className="tmd-chart line">
                 <Line data={trendData} options={trendOptions} />
               </div>
+            </div>
+          </div>
+
+          {/* ✅ Risk Table BELOW charts */}
+          <div className="tmd-panel tmd-table-panel">
+            <div className="tmd-panel-head">
+              <div className="tmd-panel-title">Risk List</div>
+              <div className="tmd-panel-tag">
+                Showing {tableRisks.length} risk{tableRisks.length !== 1 ? "s" : ""}
+              </div>
+            </div>
+
+            <div className="tmd-table-wrap">
+              <table className="table tmd-table">
+                <thead>
+                  <tr>
+                    <th>Risk</th>
+                    <th>Project</th>
+                    <th>Level</th>
+                    <th>Status</th>
+                    <th>Score</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {tableRisks.length === 0 ? (
+                    <tr>
+                      <td colSpan="5" className="tmd-empty">
+                        No risks found.
+                      </td>
+                    </tr>
+                  ) : (
+                    tableRisks.map((r) => {
+                      const pid = String(r.project_id || r.project || "");
+                      const projName =
+                        r.project_name ||
+                        projectNameById[pid] ||
+                        r.project?.name ||
+                        "—";
+
+                      const level = formatLevel(r);
+                      const status = formatStatus(r);
+                      const score = Number(r.risk_score || 0);
+
+                      return (
+                        <tr key={r.id}>
+                          <td className="tmd-risk-cell">
+                            <div className="tmd-risk-title">
+                              {r.title || "Untitled Risk"}
+                            </div>
+                            {r.description ? (
+                              <div className="tmd-risk-desc">{r.description}</div>
+                            ) : null}
+                          </td>
+
+                          <td>{projName}</td>
+
+                          <td>
+                            <span className={`tmd-badge lvl ${level.toLowerCase()}`}>
+                              {level}
+                            </span>
+                          </td>
+
+                          <td>
+                            <span className={`tmd-badge st ${status.toLowerCase()}`}>
+                              {status}
+                            </span>
+                          </td>
+
+                          <td>
+                            <span className="tmd-score">{score}</span>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
 

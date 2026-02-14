@@ -104,7 +104,7 @@ const AppNavbar = () => {
     { label: "My Projects", to: "/tm/projects" },
     { label: "My Risks", to: "/tm/risks" },
     { label: "Add Risk", to: "/tm/risks/create" },
-    { label: "Reports", to: "/tm/reports" }, // you can hide later if not ready
+    { label: "Reports", to: "/tm/report" }, // you can hide later if not ready
   ];
 
   // fallback: before role loads, show PM links (safe)
