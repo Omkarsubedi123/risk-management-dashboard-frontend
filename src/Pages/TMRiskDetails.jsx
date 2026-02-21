@@ -17,8 +17,17 @@ const TMRiskDetails = () => {
   const [risk, setRisk] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const [saving, setSaving] = useState(false);
-  const [editMode, setEditMode] = useState(false); // controls TM suggestion edit
+  // Suggestion
+  const [savingSuggestion, setSavingSuggestion] = useState(false);
+  const [editSuggestionMode, setEditSuggestionMode] = useState(false);
+
+  // ✅ NEW: Work progress
+  const [editProgressMode, setEditProgressMode] = useState(false);
+  const [savingStatus, setSavingStatus] = useState(false);
+  const [savingMitigation, setSavingMitigation] = useState(false);
+
+  const [tmRiskStatus, setTmRiskStatus] = useState("Open");
+  const [tmMitigationStatus, setTmMitigationStatus] = useState("NotStarted");
 
   const getToken = () =>
     localStorage.getItem("access") || sessionStorage.getItem("access");
@@ -27,6 +36,11 @@ const TMRiskDetails = () => {
   const tmSuggestionStatus = (risk?.tm_suggestion_status || "").toLowerCase();
 
   const canSuggest = useMemo(() => {
+    if (!risk) return false;
+    return approvalStatus === "approved";
+  }, [risk, approvalStatus]);
+
+  const canUpdateProgress = useMemo(() => {
     if (!risk) return false;
     return approvalStatus === "approved";
   }, [risk, approvalStatus]);
@@ -44,6 +58,10 @@ const TMRiskDetails = () => {
       });
 
       setRisk(res.data);
+
+      // sync local progress values
+      setTmRiskStatus(res.data.status || "Open");
+      setTmMitigationStatus(res.data.mitigation_status || "NotStarted");
     } catch (err) {
       console.error("Failed to load TM risk details:", err.response?.data || err);
       if (err.response?.status === 401) {
@@ -82,7 +100,7 @@ const TMRiskDetails = () => {
     }
 
     try {
-      setSaving(true);
+      setSavingSuggestion(true);
       const token = getToken();
 
       await axios.patch(
@@ -92,13 +110,59 @@ const TMRiskDetails = () => {
       );
 
       await fetchRiskDetails();
-      setEditMode(false);
+      setEditSuggestionMode(false);
       toast.success("Suggestion sent to PM.");
     } catch (err) {
       console.error("Failed to submit suggestion:", err.response?.data || err);
       toast.error(err?.response?.data?.detail || "Failed to submit suggestion.");
     } finally {
-      setSaving(false);
+      setSavingSuggestion(false);
+    }
+  };
+
+  // ✅ NEW: save risk.status (Open/InProgress/Closed)
+  const saveRiskStatus = async () => {
+    if (!canUpdateProgress) return;
+    try {
+      setSavingStatus(true);
+      const token = getToken();
+
+      await axios.patch(
+        `${backendUrl}/api/risks/${id}/tm-status/`,
+        { status: tmRiskStatus },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      await fetchRiskDetails();
+      toast.success("Risk status updated.");
+    } catch (err) {
+      console.error("Failed to update risk status:", err.response?.data || err);
+      toast.error(err?.response?.data?.detail || "Failed to update risk status.");
+    } finally {
+      setSavingStatus(false);
+    }
+  };
+
+  // ✅ NEW: save mitigation_status via your existing mitigation endpoint
+  const saveMitigationStatus = async () => {
+    if (!canUpdateProgress) return;
+    try {
+      setSavingMitigation(true);
+      const token = getToken();
+
+      await axios.patch(
+        `${backendUrl}/api/risks/${id}/mitigation/`,
+        { mitigation_status: tmMitigationStatus },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      await fetchRiskDetails();
+      toast.success("Mitigation progress updated.");
+    } catch (err) {
+      console.error("Failed to update mitigation status:", err.response?.data || err);
+      toast.error(err?.response?.data?.detail || "Failed to update mitigation status.");
+    } finally {
+      setSavingMitigation(false);
     }
   };
 
@@ -113,8 +177,6 @@ const TMRiskDetails = () => {
   return (
     <>
       <AppNavbar />
-
-      {/* ✅ Toast container */}
       <ToastContainer position="top-right" autoClose={2500} pauseOnHover />
 
       <div className="tmrd-wrap">
@@ -126,9 +188,7 @@ const TMRiskDetails = () => {
         ) : !risk ? (
           <div className="tmrd-empty">
             <h4>Risk not found</h4>
-            <p className="text-muted">
-              It may have been deleted or you don’t have access.
-            </p>
+            <p className="text-muted">It may have been deleted or you don’t have access.</p>
             <button className="btn btn-primary" onClick={() => navigate(-1)}>
               Go Back
             </button>
@@ -161,9 +221,7 @@ const TMRiskDetails = () => {
                   </div>
                   <div className="tmrd-kpi">
                     <div className="tmrd-kpi-label">Est. Cost</div>
-                    <div className="tmrd-kpi-value">
-                      {risk.estimated_cost ? `₹${risk.estimated_cost}` : "—"}
-                    </div>
+                    <div className="tmrd-kpi-value">{risk.estimated_cost ? `₹${risk.estimated_cost}` : "—"}</div>
                   </div>
                 </div>
               </div>
@@ -171,44 +229,54 @@ const TMRiskDetails = () => {
 
             {approvalStatus === "pending" && (
               <div className="alert alert-warning tmrd-alert">
-                ⏳ This risk is <strong>pending PM approval</strong>. Mitigation
-                suggestions are disabled until approval.
+                ⏳ This risk is <strong>pending PM approval</strong>. Updates are disabled until approval.
               </div>
             )}
 
             {approvalStatus === "rejected" && (
               <div className="alert alert-danger tmrd-alert">
-                🗑️ This risk was <strong>rejected</strong> and is in Trash. It will
-                be auto-deleted.
+                🗑️ This risk was <strong>rejected</strong> and is in Trash. It will be auto-deleted.
               </div>
             )}
 
             {approvalStatus === "approved" && (
               <div className="alert alert-success tmrd-alert">
-                ✅ This risk is <strong>approved</strong>. You can suggest a mitigation
-                plan to the PM below.
+                ✅ This risk is <strong>approved</strong>. You can update work progress and suggest mitigation.
               </div>
             )}
 
             <div className="tmrd-grid">
+              {/* LEFT */}
               <div className="tmrd-card">
-                <div className="tmrd-card-title">Details</div>
+                <div className="tmrd-card-top">
+                  <div className="tmrd-card-title">Details</div>
+
+                  <button
+                    className="btn btn-outline-primary btn-sm tmrd-editbtn"
+                    onClick={() => setEditProgressMode((p) => !p)}
+                    disabled={!canUpdateProgress}
+                    title={canUpdateProgress ? "Update your progress" : "Disabled until approved"}
+                  >
+                    🧩 {editProgressMode ? "Close" : "Update Progress"}
+                  </button>
+                </div>
 
                 <div className="tmrd-info-grid">
                   <div className="tmrd-info">
                     <div className="tmrd-info-label">Probability</div>
                     <div className="tmrd-info-value">{risk.probability ?? "—"}</div>
                   </div>
+
                   <div className="tmrd-info">
                     <div className="tmrd-info-label">Impact</div>
                     <div className="tmrd-info-value">{risk.impact ?? "—"}</div>
                   </div>
+
                   <div className="tmrd-info">
                     <div className="tmrd-info-label">Assigned To</div>
-                    <div className="tmrd-info-value">
-                      {risk.assigned_to_name || risk.assigned_to || "—"}
-                    </div>
+                    <div className="tmrd-info-value">{risk.assigned_to_name || risk.assigned_to || "—"}</div>
                   </div>
+
                   <div className="tmrd-info">
                     <div className="tmrd-info-label">Approval</div>
                     <div className="tmrd-info-value">
@@ -217,14 +285,87 @@ const TMRiskDetails = () => {
                       </span>
                     </div>
                   </div>
+
                   <div className="tmrd-info">
                     <div className="tmrd-info-label">Created</div>
                     <div className="tmrd-info-value">{fmtDate(risk.created_at)}</div>
                   </div>
+
                   <div className="tmrd-info">
                     <div className="tmrd-info-label">Updated</div>
                     <div className="tmrd-info-value">{fmtDate(risk.updated_at)}</div>
                   </div>
+                </div>
+
+                {/* ✅ NEW: Work Progress */}
+                <div className="tmrd-section">
+                  <div className="tmrd-section-title">Work Progress</div>
+
+                  <div className="tmrd-field">
+                    <label className="tmrd-label">Risk Work Status</label>
+                    {editProgressMode ? (
+                      <select
+                        className="form-select tmrd-select"
+                        value={tmRiskStatus}
+                        onChange={(e) => setTmRiskStatus(e.target.value)}
+                        disabled={!canUpdateProgress || savingStatus}
+                      >
+                        <option value="Open">Open</option>
+                        <option value="InProgress">In Progress</option>
+                        <option value="Closed">Completed (Closed)</option>
+                      </select>
+                    ) : (
+                      <div className="tmrd-readonly">{risk.status || "Open"}</div>
+                    )}
+
+                    {editProgressMode && (
+                      <div style={{ marginTop: 10 }}>
+                        <button
+                          className="btn btn-primary w-100"
+                          onClick={saveRiskStatus}
+                          disabled={savingStatus || !canUpdateProgress}
+                        >
+                          {savingStatus ? "Saving..." : "Save Risk Status"}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="tmrd-field">
+                    <label className="tmrd-label">Mitigation Progress</label>
+                    {editProgressMode ? (
+                      <select
+                        className="form-select tmrd-select"
+                        value={tmMitigationStatus}
+                        onChange={(e) => setTmMitigationStatus(e.target.value)}
+                        disabled={!canUpdateProgress || savingMitigation}
+                      >
+                        <option value="NotStarted">Not Started</option>
+                        <option value="InProgress">In Progress</option>
+                        <option value="Completed">Completed</option>
+                      </select>
+                    ) : (
+                      <div className="tmrd-readonly">{risk.mitigation_status || "NotStarted"}</div>
+                    )}
+
+                    {editProgressMode && (
+                      <div style={{ marginTop: 10 }}>
+                        <button
+                          className="btn btn-primary w-100"
+                          onClick={saveMitigationStatus}
+                          disabled={savingMitigation || !canUpdateProgress}
+                        >
+                          {savingMitigation ? "Saving..." : "Save Mitigation Progress"}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {!canUpdateProgress && (
+                    <div className="tmrd-hint">
+                      Progress updates are allowed only after PM approves the risk.
+                    </div>
+                  )}
                 </div>
 
                 <div className="tmrd-section">
@@ -233,17 +374,18 @@ const TMRiskDetails = () => {
                 </div>
               </div>
 
+              {/* RIGHT */}
               <div className="tmrd-card">
                 <div className="tmrd-card-top">
                   <div className="tmrd-card-title">Mitigation</div>
 
                   <button
                     className="btn btn-outline-primary btn-sm tmrd-editbtn"
-                    onClick={() => setEditMode((p) => !p)}
+                    onClick={() => setEditSuggestionMode((p) => !p)}
                     disabled={!canSuggest}
                     title={canSuggest ? "Write / edit your suggestion" : "Suggestions are disabled until approved"}
                   >
-                    ✏️ {editMode ? "Close" : "Suggest"}
+                    ✏️ {editSuggestionMode ? "Close" : "Suggest"}
                   </button>
                 </div>
 
@@ -257,9 +399,7 @@ const TMRiskDetails = () => {
 
                   <div className="tmrd-field">
                     <label className="tmrd-label">PM Mitigation Status</label>
-                    <div className="tmrd-readonly">
-                      {risk.mitigation_status || "NotStarted"}
-                    </div>
+                    <div className="tmrd-readonly">{risk.mitigation_status || "NotStarted"}</div>
                   </div>
 
                   <div className="tmrd-divider" />
@@ -267,7 +407,6 @@ const TMRiskDetails = () => {
                   <div className="tmrd-field">
                     <div className="tmrd-label-row">
                       <label className="tmrd-label">Your Mitigation Suggestion</label>
-
                       {risk.tm_suggestion_status ? (
                         <span className={`tmrd-suggest-pill ${badgeClass(tmSuggestionStatus)}`}>
                           {tmSuggestionStatus}
@@ -285,18 +424,16 @@ const TMRiskDetails = () => {
                           tm_mitigation_suggestion: e.target.value,
                         }))
                       }
-                      disabled={!editMode || !canSuggest || saving}
+                      disabled={!editSuggestionMode || !canSuggest || savingSuggestion}
                       placeholder="Suggest mitigation steps for PM review..."
                     />
 
                     {tmSuggestionStatus === "approved" && (
                       <div className="tmrd-hint">✅ Your suggestion was approved and applied by PM.</div>
                     )}
-
                     {tmSuggestionStatus === "rejected" && (
                       <div className="tmrd-hint">❌ Your suggestion was rejected. You can edit and submit again.</div>
                     )}
-
                     {tmSuggestionStatus === "pending" && (
                       <div className="tmrd-hint">⏳ Your suggestion is pending PM review.</div>
                     )}
@@ -310,9 +447,9 @@ const TMRiskDetails = () => {
                     <button
                       className="btn btn-primary"
                       onClick={submitSuggestion}
-                      disabled={!editMode || !canSuggest || saving}
+                      disabled={!editSuggestionMode || !canSuggest || savingSuggestion}
                     >
-                      {saving ? "Submitting..." : "Submit Suggestion"}
+                      {savingSuggestion ? "Submitting..." : "Submit Suggestion"}
                     </button>
                   </div>
 

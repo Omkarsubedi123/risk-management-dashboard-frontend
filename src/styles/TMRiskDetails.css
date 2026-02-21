@@ -294,3 +294,9 @@
   border: 1px solid transparent;
   text-transform: capitalize;
 }
+
+/* Work progress buttons spacing */
+.tmrd-section .btn.w-100 {
+  border-radius: 14px;
+  font-weight: 900;
+}
