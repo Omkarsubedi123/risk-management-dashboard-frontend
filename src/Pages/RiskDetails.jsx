@@ -6,6 +6,8 @@ import AppNavbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import "../styles/RiskDetails.css";
 
+import RiskChat from "../components/RiskChat"; // ✅ NEW
+
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -21,16 +23,13 @@ const RiskDetails = () => {
   const [risk, setRisk] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // delete confirm
   const [confirmOpen, setConfirmOpen] = useState(false);
 
-  // PM mitigation edit
   const [editMode, setEditMode] = useState(false);
   const [mitigationPlan, setMitigationPlan] = useState("");
   const [mitigationStatus, setMitigationStatus] = useState("NotStarted");
   const [saving, setSaving] = useState(false);
 
-  // Suggestion workflow
   const [processingSuggestion, setProcessingSuggestion] = useState(false);
 
   const getToken = () =>
@@ -110,7 +109,6 @@ const RiskDetails = () => {
     return hasSuggestion && suggestionStatus === "pending";
   }, [hasSuggestion, suggestionStatus]);
 
-  // --- URLs ---
   const mitigationPatchUrl = `${backendUrl}/api/risks/${id}/mitigation/`;
   const approveSuggestionUrl = `${backendUrl}/api/risks/${id}/approve-suggestion/`;
   const rejectSuggestionUrl = `${backendUrl}/api/risks/${id}/reject-suggestion/`;
@@ -145,11 +143,7 @@ const RiskDetails = () => {
       setProcessingSuggestion(true);
       const token = getToken();
 
-      await axios.patch(
-        approveSuggestionUrl,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await axios.patch(approveSuggestionUrl, {}, { headers: { Authorization: `Bearer ${token}` } });
 
       await fetchRisk();
       toast.success("Suggestion approved and applied.");
@@ -166,11 +160,7 @@ const RiskDetails = () => {
       setProcessingSuggestion(true);
       const token = getToken();
 
-      await axios.patch(
-        rejectSuggestionUrl,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await axios.patch(rejectSuggestionUrl, {}, { headers: { Authorization: `Bearer ${token}` } });
 
       await fetchRisk();
       toast.info("Suggestion rejected.");
@@ -189,9 +179,7 @@ const RiskDetails = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       toast.success("Risk deleted.");
-      navigate(projectId ? `/projects/${projectId}` : "/projects", {
-        replace: true,
-      });
+      navigate(projectId ? `/projects/${projectId}` : "/projects", { replace: true });
     } catch (e) {
       console.error("Delete failed:", e?.response?.data || e);
       toast.error(e?.response?.data?.detail || "Failed to delete risk.");
@@ -205,8 +193,6 @@ const RiskDetails = () => {
   return (
     <>
       <AppNavbar />
-
-      {/* ✅ Toast container (kept inside page so it's drop-in) */}
       <ToastContainer position="top-right" autoClose={2500} pauseOnHover />
 
       <div className="pmrd-wrap">
@@ -225,7 +211,6 @@ const RiskDetails = () => {
           </div>
         ) : (
           <div className="container pmrd-container">
-            {/* HERO HEADER */}
             <div className="pmrd-hero">
               <div>
                 <h1 className="pmrd-title">{risk.title}</h1>
@@ -253,9 +238,7 @@ const RiskDetails = () => {
                   <div className="pmrd-kpi">
                     <div className="pmrd-kpi-label">Est. Cost</div>
                     <div className="pmrd-kpi-value">
-                      {risk.estimated_cost
-                        ? `₹${Number(risk.estimated_cost).toLocaleString()}`
-                        : "—"}
+                      {risk.estimated_cost ? `₹${Number(risk.estimated_cost).toLocaleString()}` : "—"}
                     </div>
                   </div>
                 </div>
@@ -268,7 +251,6 @@ const RiskDetails = () => {
             </div>
 
             <div className="pmrd-grid">
-              {/* LEFT: DETAILS */}
               <div className="pmrd-card">
                 <div className="pmrd-card-title">Details</div>
 
@@ -292,7 +274,7 @@ const RiskDetails = () => {
                     <div className="pmrd-info-label">Approval</div>
                     <div className="pmrd-info-value">
                       <span className={`pmrd-approval approval-${(risk.approval_status || "approved").toLowerCase()}`}>
-                        {(risk.approval_status || "approved")}
+                        {risk.approval_status || "approved"}
                       </span>
                     </div>
                   </div>
@@ -325,7 +307,6 @@ const RiskDetails = () => {
                 </div>
               </div>
 
-              {/* RIGHT: MITIGATION */}
               <div className="pmrd-card">
                 <div className="pmrd-card-top">
                   <div className="pmrd-card-title">Mitigation</div>
@@ -351,9 +332,7 @@ const RiskDetails = () => {
                       placeholder="Write official mitigation steps here…"
                     />
                   ) : (
-                    <div className="pmrd-readonly">
-                      {risk.mitigation_plan || "No mitigation defined yet."}
-                    </div>
+                    <div className="pmrd-readonly">{risk.mitigation_plan || "No mitigation defined yet."}</div>
                   )}
                 </div>
 
@@ -421,11 +400,7 @@ const RiskDetails = () => {
                         ✅ Approve & Apply
                       </button>
 
-                      <button
-                        className="btn btn-light"
-                        onClick={handleRejectSuggestion}
-                        disabled={processingSuggestion}
-                      >
+                      <button className="btn btn-light" onClick={handleRejectSuggestion} disabled={processingSuggestion}>
                         ❌ Reject
                       </button>
                     </div>
@@ -455,6 +430,11 @@ const RiskDetails = () => {
                   </button>
                 </div>
               </div>
+            </div>
+
+            {/* ✅ NEW: Full-width chat section */}
+            <div className="pmrd-chat">
+              <RiskChat riskId={id} title="Risk Discussion (PM ↔ TM)" />
             </div>
 
             <div className="pmrd-bottom">

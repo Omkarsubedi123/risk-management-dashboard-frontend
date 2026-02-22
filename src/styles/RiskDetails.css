@@ -408,3 +408,8 @@
   .pmrd-info-grid { grid-template-columns: 1fr; }
   .pmrd-loss { grid-template-columns: 1fr; }
 }
+
+/*  Chat section spacing */
+.pmrd-chat {
+  margin-top: 16px;
+}
