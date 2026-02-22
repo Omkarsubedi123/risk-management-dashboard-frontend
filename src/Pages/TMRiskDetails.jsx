@@ -5,6 +5,8 @@ import AppNavbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import "../styles/TMRiskDetails.css";
 
+import RiskChat from "../components/RiskChat"; 
+
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -21,7 +23,7 @@ const TMRiskDetails = () => {
   const [savingSuggestion, setSavingSuggestion] = useState(false);
   const [editSuggestionMode, setEditSuggestionMode] = useState(false);
 
-  // ✅ NEW: Work progress
+  // Work progress
   const [editProgressMode, setEditProgressMode] = useState(false);
   const [savingStatus, setSavingStatus] = useState(false);
   const [savingMitigation, setSavingMitigation] = useState(false);
@@ -120,7 +122,7 @@ const TMRiskDetails = () => {
     }
   };
 
-  // ✅ NEW: save risk.status (Open/InProgress/Closed)
+  // save risk.status (Open/InProgress/Closed)
   const saveRiskStatus = async () => {
     if (!canUpdateProgress) return;
     try {
@@ -143,7 +145,7 @@ const TMRiskDetails = () => {
     }
   };
 
-  // ✅ NEW: save mitigation_status via your existing mitigation endpoint
+  // save mitigation_status via mitigation endpoint
   const saveMitigationStatus = async () => {
     if (!canUpdateProgress) return;
     try {
@@ -241,7 +243,7 @@ const TMRiskDetails = () => {
 
             {approvalStatus === "approved" && (
               <div className="alert alert-success tmrd-alert">
-                ✅ This risk is <strong>approved</strong>. You can update work progress and suggest mitigation.
+                 This risk is <strong>approved</strong>. You can update work progress and suggest mitigation.
               </div>
             )}
 
@@ -297,7 +299,7 @@ const TMRiskDetails = () => {
                   </div>
                 </div>
 
-                {/* ✅ NEW: Work Progress */}
+                {/* Work Progress */}
                 <div className="tmrd-section">
                   <div className="tmrd-section-title">Work Progress</div>
 
@@ -460,6 +462,10 @@ const TMRiskDetails = () => {
                   )}
                 </div>
               </div>
+            </div>
+
+            <div className="tmrd-chat">
+              <RiskChat riskId={id} title="Risk Discussion (PM ↔ TM)" />
             </div>
 
             <div className="tmrd-bottom">

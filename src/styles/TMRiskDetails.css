@@ -300,3 +300,8 @@
   border-radius: 14px;
   font-weight: 900;
 }
+
+/* Chat section spacing */
+.tmrd-chat {
+  margin-top: 16px;
+}
