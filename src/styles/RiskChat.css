@@ -172,3 +172,31 @@
   justify-content: flex-end;
   gap: 10px;
 }
+
+.rc-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rc-editbtn {
+  padding: 2px 8px;
+  border-radius: 8px;
+}
+
+.rc-edited {
+  font-size: 12px;
+  color: #64748b;
+  margin-left: 6px;
+}
+
+.rc-editbox {
+  margin-top: 6px;
+}
+
+.rc-edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
