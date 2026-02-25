@@ -9,7 +9,7 @@
   max-width: 1100px;
 }
 
-/* ===== Header (Smaller + Reports Style) ===== */
+/* ===== Header (keep your current) ===== */
 .projects-header {
   background: linear-gradient(90deg, #0b1320 0%, #10244a 45%, #1f3fa6 100%);
   padding: 30px 0 22px;
@@ -81,43 +81,7 @@
   font-size: 16px;
 }
 
-/* ===== Cards ===== */
-.project-card {
-  border-radius: 14px;
-  border: none;
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.08);
-  transition: transform 0.15s ease;
-}
-
-.project-card:hover {
-  transform: translateY(-3px);
-}
-
-.project-card-top {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.project-card-title {
-  font-weight: 800;
-}
-
-.project-sector-badge {
-  background: rgba(37, 99, 235, 0.15);
-  color: #2563eb;
-  font-size: 12px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-weight: 700;
-}
-
-.project-card-desc {
-  margin-top: 10px;
-  color: #6c757d;
-}
-
-/* ===== States ===== */
+/* ===== Loading/Empty ===== */
 .projects-loading {
   padding: 60px;
   text-align: center;
@@ -130,6 +94,139 @@
   border-radius: 12px;
 }
 
+/* =========================================================
+   PM Project Cards (Compact TM-style)
+   ========================================================= */
+
+.pmproj-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 14px 16px;              /* reduced padding */
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.07);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.pmproj-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.09);
+}
+
+/* ---------- Top Section ---------- */
+
+.pmproj-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.pmproj-title {
+  margin: 0;
+  font-size: 19px;           /* smaller title */
+  font-weight: 800;
+  color: #0b1320;
+  line-height: 1.2;
+}
+
+.pmproj-desc {
+  margin: 6px 0 0;           /* less spacing */
+  color: #6b7280;
+  font-size: 14px;           /* smaller desc */
+  font-weight: 600;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.pmproj-pill {
+  padding: 6px 10px;         /* smaller badge */
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.pmproj-pill-sector {
+  background: rgba(37, 99, 235, 0.12);
+  color: #1d4ed8;
+}
+
+/* ---------- Middle Section ---------- */
+
+.pmproj-mid {
+  margin-top: 10px;          /* reduced */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.pmproj-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pmproj-chip {
+  padding: 6px 10px;         /* smaller chip */
+  border-radius: 999px;
+  background: #f3f6fb;
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pmproj-chip strong {
+  font-weight: 900;
+}
+
+.pmproj-status {
+  padding: 6px 12px;         /* smaller status */
+  border-radius: 999px;
+  border: 2px solid rgba(34, 197, 94, 0.45);
+  color: #16a34a;
+  background: rgba(34, 197, 94, 0.08);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+/* ---------- Buttons ---------- */
+
+.pmproj-actions {
+  margin-top: 12px;          /* reduced spacing */
+  display: flex;
+  gap: 10px;
+}
+
+.pmproj-btn {
+  height: 38px;              /* reduced button height */
+  padding: 0 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+  border: 2px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.15s ease;
+}
+
+.pmproj-btn-outline {
+  background: #ffffff;
+  color: #2563eb;
+  border-color: rgba(37, 99, 235, 0.45);
+}
+
+.pmproj-btn-primary {
+  background: #1d4ed8;
+  color: #ffffff;
+  box-shadow: 0 10px 18px rgba(29, 78, 216, 0.25);
+}
+
 /* ===== Mobile ===== */
 @media (max-width: 768px) {
   .projects-header-row {
@@ -140,5 +237,18 @@
 
   .projects-toolbar {
     grid-template-columns: 1fr;
+  }
+
+  .pmproj-title {
+    font-size: 20px;
+  }
+
+  .pmproj-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pmproj-btn {
+    width: 100%;
   }
 }

@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import "../styles/GlobalRiskList.css";
@@ -8,6 +8,8 @@ import PendingRiskApprovals from "../components/PendingRiskApprovals";
 
 const GlobalRiskList = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
   const [risks, setRisks] = useState([]);
   const [filters, setFilters] = useState({
     risk_level: "",
@@ -18,25 +20,50 @@ const GlobalRiskList = () => {
   const getToken = () =>
     localStorage.getItem("access") || sessionStorage.getItem("access");
 
+  // ✅ projectId passed from ProjectList via Link state
+  const projectId = useMemo(() => {
+    const v = location.state?.projectId;
+    if (v === undefined || v === null) return null;
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  }, [location.state]);
+
   useEffect(() => {
     fetchRisks();
     // eslint-disable-next-line
-  }, [filters]);
+  }, [filters, projectId]);
 
   const fetchRisks = async () => {
     const token = getToken();
+    if (!token) {
+      navigate("/login", { state: { forceLogin: true } });
+      return;
+    }
 
     // ✅ send only non-empty filters
     const params = Object.fromEntries(
       Object.entries(filters).filter(([_, v]) => v)
     );
 
+    // ✅ if came from project -> filter global list by project
+    if (projectId) params.project = projectId;
+
     const res = await axios.get("http://127.0.0.1:8000/api/risks/global/", {
       headers: { Authorization: `Bearer ${token}` },
-      params, // ✅ FIXED (was params: filters)
+      params,
     });
 
     setRisks(res.data || []);
+  };
+
+  const clearProjectFilter = () => {
+    // remove state so this page becomes global again
+    navigate("/risks", { replace: true, state: null });
+  };
+
+  const resetAll = () => {
+    setFilters({ risk_level: "", status: "", mitigation_status: "" });
+    navigate("/risks", { replace: true, state: null });
   };
 
   return (
@@ -46,11 +73,32 @@ const GlobalRiskList = () => {
       <div className="gr-container">
         {/* Header */}
         <div className="gr-header">
-          <h2>Global Risk Register</h2>
-          <p>Centralized view of risks across all projects</p>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap: 12,
+            }}
+          >
+            <div>
+              <h2>{projectId ? "Project Risk Register" : "Global Risk Register"}</h2>
+              <p>
+                {projectId
+                  ? `Showing risks for Project ID: ${projectId}`
+                  : "Centralized view of risks across all projects"}
+              </p>
+            </div>
+
+            {projectId && (
+              <button className="view-btn" onClick={clearProjectFilter}>
+                Clear Project Filter
+              </button>
+            )}
+          </div>
         </div>
 
-        {/* ✅ Pending approvals should be here (between header and filters) */}
+        {/* Pending approvals */}
         <PendingRiskApprovals />
 
         {/* Filters */}
@@ -89,13 +137,7 @@ const GlobalRiskList = () => {
             <option value="Completed">Completed</option>
           </select>
 
-          {/* Optional: quick reset */}
-          <button
-            className="view-btn"
-            onClick={() =>
-              setFilters({ risk_level: "", status: "", mitigation_status: "" })
-            }
-          >
+          <button className="view-btn" onClick={resetAll}>
             Reset
           </button>
         </div>

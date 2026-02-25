@@ -67,6 +67,38 @@ const ProjectList = () => {
     });
   }, [projects, search, sector]);
 
+  const getDisplayTeamCount = (p) => {
+    // supports multiple backend shapes safely
+    if (typeof p.team_count === "number") return p.team_count;
+    if (Array.isArray(p.team_members)) return p.team_members.length;
+    if (Array.isArray(p.team)) return p.team.length;
+    return p.team_count ?? 0;
+  };
+
+  const getPmEmail = (p) => {
+    return (
+      p.pm_email ||
+      p.pm?.email ||
+      p.project_manager?.email ||
+      p.manager_email ||
+      "N/A"
+    );
+  };
+
+  const getStatusLabel = (p) => {
+    // supports different field names, fallback to "Active"
+    const raw =
+      p.status ||
+      p.project_status ||
+      p.state ||
+      p.is_active ||
+      p.active ||
+      "Active";
+
+    if (typeof raw === "boolean") return raw ? "Active" : "Inactive";
+    return String(raw).trim() || "Active";
+  };
+
   return (
     <>
       <AppNavbar />
@@ -132,34 +164,69 @@ const ProjectList = () => {
               <h5>No projects found</h5>
             </div>
           ) : (
-            <div className="row">
-              {filteredProjects.map((project) => (
-                <div key={project.id} className="col-md-4 mb-4">
-                  <div className="card project-card h-100">
-                    <div className="card-body d-flex flex-column">
-                      <div className="project-card-top">
-                        <h5 className="project-card-title">{project.name}</h5>
-                        <span className="project-sector-badge">
-                          {project.sector || "N/A"}
-                        </span>
+            <div className="row g-4">
+              {filteredProjects.map((project) => {
+                const teamCount = getDisplayTeamCount(project);
+                const pmEmail = getPmEmail(project);
+                const statusLabel = getStatusLabel(project);
+
+                return (
+                  <div key={project.id} className="col-12 col-lg-6">
+                    <div className="pmproj-card">
+                      <div className="pmproj-top">
+                        <div className="pmproj-title-wrap">
+                          <h3 className="pmproj-title">{project.name}</h3>
+                          <p className="pmproj-desc">
+                            {project.description
+                              ? project.description
+                              : "No description"}
+                          </p>
+                        </div>
+
+                        <div className="pmproj-badges">
+                          <span className="pmproj-pill pmproj-pill-sector">
+                            {project.sector || "N/A"}
+                          </span>
+                        </div>
                       </div>
 
-                      <p className="project-card-desc flex-grow-1">
-                        {project.description
-                          ? project.description.slice(0, 120)
-                          : "No description"}
-                      </p>
+                      <div className="pmproj-mid">
+                        <div className="pmproj-chips">
+                          <span className="pmproj-chip">
+                            <span className="pmproj-chip-ico">👥</span>
+                            Team: <strong>{teamCount}</strong>
+                          </span>
 
-                      <Link
-                        to={`/projects/${project.id}`}
-                        className="btn btn-outline-primary btn-sm"
-                      >
-                        View Details →
-                      </Link>
+                          <span className="pmproj-chip">
+                            <span className="pmproj-chip-ico">🧑‍💼</span>
+                            PM: <strong>{pmEmail}</strong>
+                          </span>
+                        </div>
+
+                        <span className="pmproj-status">{statusLabel}</span>
+                      </div>
+
+                      <div className="pmproj-actions">
+                        <Link
+                          to={`/projects/${project.id}`}
+                          className="pmproj-btn pmproj-btn-outline"
+                        >
+                          Open →
+                        </Link>
+
+                        {/* Uses query param only (safe even if you don't handle it yet) */}
+                        <Link
+                          to="/risks"
+                          state={{ projectId: project.id, fromProject: true }}
+                          className="pmproj-btn pmproj-btn-primary"
+                        >
+                          My Risks →
+                        </Link>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
