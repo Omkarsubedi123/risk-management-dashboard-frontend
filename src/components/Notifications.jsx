@@ -1,17 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { Dropdown, Badge } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import "./../styles/Notifications.css";
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:8000";
+
 const Notifications = () => {
   const navigate = useNavigate();
+  const dropdownRef = useRef(null);
 
   const getToken = () =>
     localStorage.getItem("access") || sessionStorage.getItem("access");
 
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // control dropdown open/close so we can close after click
+  const [open, setOpen] = useState(false);
 
   const unreadCount = items.filter((n) => !n.is_read).length;
 
@@ -21,7 +27,7 @@ const Notifications = () => {
 
     setLoading(true);
     try {
-      const res = await axios.get("http://127.0.0.1:8000/api/notifications/", {
+      const res = await axios.get(`${BACKEND_URL}/api/notifications/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setItems(res.data || []);
@@ -43,14 +49,12 @@ const Notifications = () => {
 
     try {
       await axios.post(
-        "http://127.0.0.1:8000/api/notifications/mark-all-read/",
+        `${BACKEND_URL}/api/notifications/mark-all-read/`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
       fetchNotifications();
-    } catch (err) {
-      // optional: handle error
-    }
+    } catch {}
   };
 
   // ✅ Clear all
@@ -59,13 +63,11 @@ const Notifications = () => {
     if (!token) return;
 
     try {
-      await axios.delete("http://127.0.0.1:8000/api/notifications/clear/", {
+      await axios.delete(`${BACKEND_URL}/api/notifications/clear/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchNotifications();
-    } catch (err) {
-      // optional: handle error
-    }
+    } catch {}
   };
 
   // ✅ Mark single as read
@@ -80,7 +82,7 @@ const Notifications = () => {
 
     try {
       await axios.patch(
-        `http://127.0.0.1:8000/api/notifications/${notifId}/read/`,
+        `${BACKEND_URL}/api/notifications/${notifId}/read/`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -89,6 +91,20 @@ const Notifications = () => {
       setItems((prev) =>
         prev.map((n) => (n.id === notifId ? { ...n, is_read: false } : n))
       );
+    }
+  };
+
+  const handleNotificationClick = async (n) => {
+    // 1) mark read
+    await markRead(n.id);
+
+    // 2) close dropdown
+    setOpen(false);
+
+    // 3) redirect if backend provided redirect_url
+    const url = (n.redirect_url || "").trim();
+    if (url) {
+      navigate(url);
     }
   };
 
@@ -117,7 +133,13 @@ const Notifications = () => {
   }, []);
 
   return (
-    <Dropdown align="end" className="notif-wrap">
+    <Dropdown
+      align="end"
+      className="notif-wrap"
+      show={open}
+      onToggle={(isOpen) => setOpen(isOpen)}
+      ref={dropdownRef}
+    >
       <Dropdown.Toggle
         variant="link"
         className="notif-toggle"
@@ -142,7 +164,6 @@ const Notifications = () => {
               : "All caught up"}
           </div>
 
-          {/* ✅ Actions */}
           <div className="notif-actions" style={{ display: "flex", gap: 8, marginTop: 10 }}>
             <button
               type="button"
@@ -173,13 +194,21 @@ const Notifications = () => {
                 key={n.id}
                 type="button"
                 className={`notif-item ${n.is_read ? "read" : "unread"}`}
-                onClick={() => markRead(n.id)}
+                onClick={() => handleNotificationClick(n)}
+                title={n.redirect_url ? "Click to open" : "Click to mark as read"}
               >
                 <div className="notif-item-top">
                   <div className="notif-item-title">{n.title}</div>
                   <div className="notif-item-time">{timeAgo(n.created_at)}</div>
                 </div>
                 <div className="notif-item-msg">{n.message}</div>
+
+                {/* small hint if it can redirect */}
+                {!!(n.redirect_url || "").trim() && (
+                  <div style={{ marginTop: 6, fontSize: 12, fontWeight: 800, color: "#2563eb" }}>
+                    Open →
+                  </div>
+                )}
               </button>
             ))
           )}
