@@ -5,8 +5,7 @@ import ConfirmModal from "../components/ConfirmModal";
 import AppNavbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import "../styles/RiskDetails.css";
-
-import RiskChat from "../components/RiskChat"; // ✅ NEW
+import RiskChat from "../components/RiskChat";
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -17,7 +16,6 @@ const RiskDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-
   const projectId = location.state?.projectId;
 
   const [risk, setRisk] = useState(null);
@@ -31,6 +29,14 @@ const RiskDetails = () => {
   const [saving, setSaving] = useState(false);
 
   const [processingSuggestion, setProcessingSuggestion] = useState(false);
+
+  // AI
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiSuggestion, setAiSuggestion] = useState("");
+  const [aiError, setAiError] = useState("");
+
+  // chat mount control (prevents auto page jump to bottom)
+  const [showChat, setShowChat] = useState(false);
 
   const getToken = () =>
     localStorage.getItem("access") || sessionStorage.getItem("access");
@@ -112,6 +118,39 @@ const RiskDetails = () => {
   const mitigationPatchUrl = `${backendUrl}/api/risks/${id}/mitigation/`;
   const approveSuggestionUrl = `${backendUrl}/api/risks/${id}/approve-suggestion/`;
   const rejectSuggestionUrl = `${backendUrl}/api/risks/${id}/reject-suggestion/`;
+  const aiMitigationUrl = `${backendUrl}/api/risks/${id}/ai-mitigation/`;
+
+  const handleGenerateAI = async () => {
+    try {
+      setAiLoading(true);
+      setAiError("");
+      setAiSuggestion("");
+
+      const token = getToken();
+
+      const res = await axios.post(
+        aiMitigationUrl,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setAiSuggestion((res.data?.suggestion || "").trim());
+      toast.success("AI mitigation generated.");
+    } catch (err) {
+      console.error("AI mitigation failed:", err?.response?.data || err);
+      const msg = err?.response?.data?.detail || "AI generation failed.";
+      setAiError(msg);
+      toast.error(msg);
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const applyAiSuggestion = () => {
+    if (!aiSuggestion.trim()) return;
+    setMitigationPlan(aiSuggestion);
+    toast.success("AI suggestion applied.");
+  };
 
   const handleMitigationSave = async () => {
     try {
@@ -129,6 +168,8 @@ const RiskDetails = () => {
 
       await fetchRisk();
       setEditMode(false);
+      setAiSuggestion("");
+      setAiError("");
       toast.success("Mitigation saved successfully.");
     } catch (e) {
       console.error("Failed to save mitigation:", e?.response?.data || e);
@@ -143,7 +184,11 @@ const RiskDetails = () => {
       setProcessingSuggestion(true);
       const token = getToken();
 
-      await axios.patch(approveSuggestionUrl, {}, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.patch(
+        approveSuggestionUrl,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
       await fetchRisk();
       toast.success("Suggestion approved and applied.");
@@ -160,7 +205,11 @@ const RiskDetails = () => {
       setProcessingSuggestion(true);
       const token = getToken();
 
-      await axios.patch(rejectSuggestionUrl, {}, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.patch(
+        rejectSuggestionUrl,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
       await fetchRisk();
       toast.info("Suggestion rejected.");
@@ -176,7 +225,7 @@ const RiskDetails = () => {
     try {
       const token = getToken();
       await axios.delete(`${backendUrl}/api/risks/${id}/`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}` }
       });
       toast.success("Risk deleted.");
       navigate(projectId ? `/projects/${projectId}` : "/projects", { replace: true });
@@ -246,11 +295,11 @@ const RiskDetails = () => {
             </div>
 
             <div className="alert alert-success pmrd-alert">
-              ✅ You are viewing this risk as <strong>Project Manager</strong>. You can update mitigation and review TM
-              suggestions below.
+              ✅ You are viewing this risk as <strong>Project Manager</strong>. You can update mitigation, generate AI mitigation, and review TM suggestions below.
             </div>
 
             <div className="pmrd-grid">
+              {/* LEFT CARD */}
               <div className="pmrd-card">
                 <div className="pmrd-card-title">Details</div>
 
@@ -307,6 +356,7 @@ const RiskDetails = () => {
                 </div>
               </div>
 
+              {/* RIGHT CARD */}
               <div className="pmrd-card">
                 <div className="pmrd-card-top">
                   <div className="pmrd-card-title">Mitigation</div>
@@ -323,16 +373,71 @@ const RiskDetails = () => {
                 <div className="pmrd-field">
                   <label className="pmrd-label">PM Mitigation Plan</label>
                   {editMode ? (
-                    <textarea
-                      className="form-control pmrd-textarea"
-                      rows={6}
-                      value={mitigationPlan}
-                      onChange={(e) => setMitigationPlan(e.target.value)}
-                      disabled={saving}
-                      placeholder="Write official mitigation steps here…"
-                    />
+                    <>
+                      <textarea
+                        className="form-control pmrd-textarea"
+                        rows={6}
+                        value={mitigationPlan}
+                        onChange={(e) => setMitigationPlan(e.target.value)}
+                        disabled={saving}
+                        placeholder="Write official mitigation steps here…"
+                      />
+
+                      <div style={{ marginTop: 10 }}>
+                        <button
+                          className="btn btn-outline-dark btn-sm"
+                          onClick={handleGenerateAI}
+                          disabled={aiLoading || saving}
+                          type="button"
+                        >
+                          {aiLoading ? "Generating..." : "✨ Generate AI"}
+                        </button>
+
+                        {aiError && (
+                          <div className="text-danger mt-2" style={{ fontWeight: 700 }}>
+                            {aiError}
+                          </div>
+                        )}
+
+                        {aiSuggestion && (
+                          <div className="pmrd-suggest-box" style={{ marginTop: 10 }}>
+                            <div className="pmrd-suggest-title">AI Suggestion</div>
+
+                            <div
+                              className="pmrd-suggest-text"
+                              style={{ whiteSpace: "pre-line" }}
+                            >
+                              {aiSuggestion}
+                            </div>
+
+                            <div className="pmrd-suggest-actions">
+                              <button
+                                className="btn btn-primary"
+                                onClick={applyAiSuggestion}
+                                type="button"
+                              >
+                                ✅ Apply Suggestion
+                              </button>
+
+                              <button
+                                className="btn btn-light"
+                                onClick={() => {
+                                  setAiSuggestion("");
+                                  setAiError("");
+                                }}
+                                type="button"
+                              >
+                                Clear
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </>
                   ) : (
-                    <div className="pmrd-readonly">{risk.mitigation_plan || "No mitigation defined yet."}</div>
+                    <div className="pmrd-readonly">
+                      {risk.mitigation_plan || "No mitigation defined yet."}
+                    </div>
                   )}
                 </div>
 
@@ -360,10 +465,26 @@ const RiskDetails = () => {
 
                 {editMode && (
                   <div className="pmrd-actions-row">
-                    <button className="btn btn-light" onClick={() => setEditMode(false)} disabled={saving}>
+                    <button
+                      className="btn btn-light"
+                      onClick={() => {
+                        setEditMode(false);
+                        setMitigationPlan(risk.mitigation_plan || "");
+                        setMitigationStatus(risk.mitigation_status || "NotStarted");
+                        setAiSuggestion("");
+                        setAiError("");
+                      }}
+                      disabled={saving}
+                      type="button"
+                    >
                       Cancel
                     </button>
-                    <button className="btn btn-primary" onClick={handleMitigationSave} disabled={saving}>
+                    <button
+                      className="btn btn-primary"
+                      onClick={handleMitigationSave}
+                      disabled={saving}
+                      type="button"
+                    >
                       {saving ? "Saving..." : "Save"}
                     </button>
                   </div>
@@ -396,11 +517,17 @@ const RiskDetails = () => {
                         onClick={handleApproveSuggestion}
                         disabled={processingSuggestion}
                         title="Approve and apply suggestion to PM mitigation"
+                        type="button"
                       >
                         ✅ Approve & Apply
                       </button>
 
-                      <button className="btn btn-light" onClick={handleRejectSuggestion} disabled={processingSuggestion}>
+                      <button
+                        className="btn btn-light"
+                        onClick={handleRejectSuggestion}
+                        disabled={processingSuggestion}
+                        type="button"
+                      >
                         ❌ Reject
                       </button>
                     </div>
@@ -414,31 +541,58 @@ const RiskDetails = () => {
                 </div>
 
                 <div className="pmrd-bottom-actions">
-                  <button className="btn btn-outline-secondary" onClick={goBack}>
+                  <button className="btn btn-outline-secondary" onClick={goBack} type="button">
                     ← Back
                   </button>
 
                   <button
                     className="btn btn-outline-primary"
                     onClick={() => navigate(`/risks/${id}/edit`, { state: { projectId } })}
+                    type="button"
                   >
                     ✏️ Edit Risk
                   </button>
 
-                  <button className="btn btn-danger" onClick={() => setConfirmOpen(true)}>
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => setConfirmOpen(true)}
+                    type="button"
+                  >
                     🗑 Delete
                   </button>
                 </div>
               </div>
             </div>
 
-            {/* ✅ NEW: Full-width chat section */}
+            {/* CHAT */}
             <div className="pmrd-chat">
-              <RiskChat riskId={id} title="Risk Discussion (PM ↔ TM)" />
+              <div className="pmrd-card">
+                <div className="pmrd-card-top">
+                  <div className="pmrd-card-title">Discussion</div>
+
+                  <button
+                    className="btn btn-outline-primary btn-sm"
+                    type="button"
+                    onClick={() => setShowChat((prev) => !prev)}
+                  >
+                    {showChat ? "Close Discussion" : "Open Discussion"}
+                  </button>
+                </div>
+
+                {showChat ? (
+                  <div style={{ marginTop: 12 }}>
+                    <RiskChat riskId={id} title="Risk Discussion (PM ↔ TM)" />
+                  </div>
+                ) : (
+                  <div className="pmrd-readonly" style={{ marginTop: 12 }}>
+                    Discussion is hidden by default to prevent automatic page jumping.
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="pmrd-bottom">
-              <button className="btn btn-outline-secondary" onClick={goBack}>
+              <button className="btn btn-outline-secondary" onClick={goBack} type="button">
                 ← Back to Project
               </button>
             </div>
