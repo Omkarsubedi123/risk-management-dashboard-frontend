@@ -1,14 +1,26 @@
 import React from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 
 const AdminRoute = ({ children }) => {
+  const location = useLocation();
+
   const access =
     localStorage.getItem("access") || sessionStorage.getItem("access");
+
   const role =
     localStorage.getItem("role") || sessionStorage.getItem("role");
 
-  if (!access) return <Navigate to="/login" replace />;
-  if (role !== "AD") return <Navigate to="/login" replace />;
+  if (!access) {
+    return <Navigate to="/login" replace state={{ forceLogin: true }} />;
+  }
+
+  if (!role) {
+    return <Navigate to="/login" replace state={{ forceLogin: true }} />;
+  }
+
+  if (role !== "AD") {
+    return <Navigate to="/login" replace state={{ forceLogin: true }} />;
+  }
 
   return children;
 };

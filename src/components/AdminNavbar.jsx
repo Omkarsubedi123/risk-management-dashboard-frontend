@@ -1,19 +1,51 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import "../styles/Admin.css";
 
 const AdminNavbar = () => {
   const navigate = useNavigate();
+  const dropdownRef = useRef(null);
+
+  const [openMenu, setOpenMenu] = useState(false);
+
+  const username =
+    localStorage.getItem("username") ||
+    sessionStorage.getItem("username") ||
+    "Admin";
 
   const handleLogout = () => {
     localStorage.removeItem("access");
     localStorage.removeItem("refresh");
     localStorage.removeItem("role");
     localStorage.removeItem("username");
-    localStorage.removeItem("email");
     localStorage.removeItem("user_id");
-    navigate("/login");
+    localStorage.removeItem("email");
+
+    sessionStorage.removeItem("access");
+    sessionStorage.removeItem("refresh");
+    sessionStorage.removeItem("role");
+    sessionStorage.removeItem("username");
+    sessionStorage.removeItem("user_id");
+    sessionStorage.removeItem("email");
+
+    window.location.href = "/login";
   };
+
+  const handleProfile = () => {
+    setOpenMenu(false);
+    navigate("/profile");
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpenMenu(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <header className="admin-topbar">
@@ -55,9 +87,35 @@ const AdminNavbar = () => {
           </NavLink>
         </nav>
 
-        <button className="admin-logout-btn" onClick={handleLogout}>
-          Logout
-        </button>
+        <div className="admin-user-menu" ref={dropdownRef}>
+          <button
+            className="admin-user-btn"
+            onClick={() => setOpenMenu((prev) => !prev)}
+          >
+            <span>{username}</span>
+            <span className={`admin-user-caret ${openMenu ? "open" : ""}`}>▼</span>
+          </button>
+
+          {openMenu && (
+            <div className="admin-user-dropdown">
+              <button
+                className="admin-user-dropdown-item"
+                onClick={handleProfile}
+              >
+                My Profile
+              </button>
+
+              <div className="admin-user-role-text">Role: Admin</div>
+
+              <button
+                className="admin-user-dropdown-item logout"
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );

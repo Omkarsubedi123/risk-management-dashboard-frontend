@@ -5,7 +5,8 @@ import "./../styles/Navbar.css";
 import Notifications from "./Notifications";
 import axios from "axios";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:8000";
+const BACKEND_URL =
+  import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:8000";
 
 const AppNavbar = () => {
   const navigate = useNavigate();
@@ -20,14 +21,23 @@ const AppNavbar = () => {
   const handleLogout = () => {
     localStorage.removeItem("access");
     localStorage.removeItem("refresh");
+    localStorage.removeItem("role");
+    localStorage.removeItem("username");
+    localStorage.removeItem("user_id");
+    localStorage.removeItem("email");
+    localStorage.removeItem("me_cache");
+
     sessionStorage.removeItem("access");
     sessionStorage.removeItem("refresh");
-    localStorage.removeItem("me_cache");
+    sessionStorage.removeItem("role");
+    sessionStorage.removeItem("username");
+    sessionStorage.removeItem("user_id");
+    sessionStorage.removeItem("email");
     sessionStorage.removeItem("me_cache");
+
     navigate("/login");
   };
 
-  // ✅ role resolver (supports different backend naming)
   const role = useMemo(() => {
     const r =
       me?.role ||
@@ -35,29 +45,40 @@ const AppNavbar = () => {
       me?.user_type ||
       me?.account_type ||
       me?.type ||
+      localStorage.getItem("role") ||
+      sessionStorage.getItem("role") ||
       "";
-    return String(r).toLowerCase(); // "pm" or "tm"
+    return String(r).toLowerCase();
   }, [me]);
 
   const isPM = role === "pm" || role === "project_manager";
   const isTM = role === "tm" || role === "team_member";
+  const isAD = role === "ad" || role === "admin";
 
   const displayName =
-    me?.first_name || me?.username || me?.email || "Account";
+    me?.first_name ||
+    me?.username ||
+    localStorage.getItem("username") ||
+    sessionStorage.getItem("username") ||
+    me?.email ||
+    "Account";
 
-  const homeRoute = isTM ? "/tm/dashboard" : "/pmdashboard";
+  const homeRoute = isAD
+    ? "/admin/dashboard"
+    : isTM
+    ? "/tm/dashboard"
+    : "/pmdashboard";
 
   const fetchMe = async () => {
     const token = getToken();
     if (!token) return;
 
-    // ✅ try cache first (avoid extra API calls)
     const cached =
       localStorage.getItem("me_cache") || sessionStorage.getItem("me_cache");
+
     if (cached) {
       try {
         setMe(JSON.parse(cached));
-        return;
       } catch {
         // ignore bad cache
       }
@@ -68,9 +89,9 @@ const AppNavbar = () => {
       const res = await axios.get(`${BACKEND_URL}/api/users/me/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       setMe(res.data);
 
-      // store cache in whichever storage token exists
       if (localStorage.getItem("access")) {
         localStorage.setItem("me_cache", JSON.stringify(res.data));
       } else {
@@ -90,7 +111,6 @@ const AppNavbar = () => {
     // eslint-disable-next-line
   }, []);
 
-  // ✅ Nav items (PM/TM)
   const pmLinks = [
     { label: "Dashboard", to: "/pmdashboard" },
     { label: "Projects", to: "/projects" },
@@ -104,16 +124,28 @@ const AppNavbar = () => {
     { label: "My Projects", to: "/tm/projects" },
     { label: "My Risks", to: "/tm/risks" },
     { label: "Add Risk", to: "/tm/risks/create" },
-    { label: "Reports", to: "/tm/report" }, // you can hide later if not ready
+    { label: "Reports", to: "/tm/report" },
   ];
 
-  // fallback: before role loads, show PM links (safe)
-  const activeLinks = isTM ? tmLinks : pmLinks;
+  const adminLinks = [
+    { label: "Dashboard", to: "/admin/dashboard" },
+    { label: "Users", to: "/admin/users" },
+    { label: "Transfer Ownership", to: "/admin/transfer" },
+  ];
+
+  const activeLinks = isAD ? adminLinks : isTM ? tmLinks : pmLinks;
 
   const isActive = (to) => {
-    // simple active detection; works for nested routes
     return location.pathname === to || location.pathname.startsWith(to + "/");
   };
+
+  const roleLabel = isAD
+    ? "Admin"
+    : isTM
+    ? "Team Member"
+    : isPM
+    ? "Project Manager"
+    : "User";
 
   return (
     <Navbar bg="dark" variant="dark" expand="lg" className="py-3 shadow-sm">
@@ -141,8 +173,7 @@ const AppNavbar = () => {
           </Nav>
 
           <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-            {/* Notifications should work for both PM and TM */}
-            <Notifications />
+            {!isAD && <Notifications />}
 
             <Dropdown align="end" className="me-3">
               <Dropdown.Toggle variant="outline-light" id="dropdown-user">
@@ -167,9 +198,8 @@ const AppNavbar = () => {
                   My Profile
                 </Dropdown.Item>
 
-                {/* Optional: show role label */}
                 <Dropdown.Item disabled style={{ fontSize: 12, opacity: 0.75 }}>
-                  Role: {isTM ? "Team Member" : isPM ? "Project Manager" : "User"}
+                  Role: {roleLabel}
                 </Dropdown.Item>
 
                 <Dropdown.Divider />

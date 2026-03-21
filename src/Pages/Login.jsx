@@ -7,7 +7,7 @@ import Footer from "../components/Footer";
 import "./../styles/Login.css";
 import LandingLogo from "../assets/LandingLogo.png";
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL;
+const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:8000";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -20,32 +20,54 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // AUTO LOGIN CHECK
+  const redirectByRole = (role) => {
+    if (role === "AD") {
+      navigate("/admin/dashboard");
+    } else if (role === "PM") {
+      navigate("/pmdashboard");
+    } else {
+      navigate("/tm/dashboard");
+    }
+  };
+
   useEffect(() => {
-    const access = localStorage.getItem("access") || sessionStorage.getItem("access");
-    const role = localStorage.getItem("role") || sessionStorage.getItem("role");
+    const access =
+      localStorage.getItem("access") || sessionStorage.getItem("access");
+    const role =
+      localStorage.getItem("role") || sessionStorage.getItem("role");
 
     if (access && role && !location.state?.forceLogin) {
-      if (role === "PM") navigate("/pmdashboard");
-      else navigate("/tm/dashboard");
+      redirectByRole(role);
     }
-  }, []);
+  }, [location.state, navigate]);
 
-  // FIXED: Safe session saving
+  const clearAllSessions = () => {
+    localStorage.removeItem("access");
+    localStorage.removeItem("refresh");
+    localStorage.removeItem("role");
+    localStorage.removeItem("username");
+    localStorage.removeItem("user_id");
+    localStorage.removeItem("email");
+
+    sessionStorage.removeItem("access");
+    sessionStorage.removeItem("refresh");
+    sessionStorage.removeItem("role");
+    sessionStorage.removeItem("username");
+    sessionStorage.removeItem("user_id");
+    sessionStorage.removeItem("email");
+  };
+
   const saveSession = (data) => {
-    if (rememberMe) {
-      localStorage.setItem("access", data.access);
-      localStorage.setItem("refresh", data.refresh);
-      localStorage.setItem("role", data.role);
-      localStorage.setItem("username", data.username);
-      if (data.user_id) localStorage.setItem("user_id", data.user_id);
-    } else {
-      sessionStorage.setItem("access", data.access);
-      sessionStorage.setItem("refresh", data.refresh);
-      sessionStorage.setItem("role", data.role);
-      sessionStorage.setItem("username", data.username);
-      if (data.user_id) sessionStorage.setItem("user_id", data.user_id);
-    }
+    clearAllSessions();
+
+    const storage = rememberMe ? localStorage : sessionStorage;
+
+    storage.setItem("access", data.access);
+    storage.setItem("refresh", data.refresh);
+    storage.setItem("role", data.role || "");
+    storage.setItem("username", data.username || "");
+    storage.setItem("user_id", data.user_id || "");
+    storage.setItem("email", data.email || "");
   };
 
   const handleLogin = async (e) => {
@@ -54,25 +76,36 @@ const Login = () => {
     setLoading(true);
 
     try {
-      // FIXED: JWT endpoint
       const response = await axios.post(`${backendUrl}/api/users/login/`, {
         email,
-        password
+        password,
       });
 
       saveSession(response.data);
 
       const { role } = response.data;
-
-      // FIXED: correct route
-      if (role === "PM") navigate("/pmdashboard");
-      else navigate("/tm/dashboard");
+      redirectByRole(role);
     } catch (error) {
       console.error("Login error:", error);
 
-      const message =
-        error.response?.data?.detail ||
-        "Invalid email or password. Please try again.";
+      const data = error.response?.data;
+
+      let message = "Invalid email or password. Please try again.";
+
+      if (typeof data === "string") {
+        message = data;
+      } else if (data?.detail) {
+        message = data.detail;
+      } else if (Array.isArray(data?.non_field_errors) && data.non_field_errors.length) {
+        message = data.non_field_errors[0];
+      } else if (typeof data === "object") {
+        const firstValue = Object.values(data)[0];
+        if (Array.isArray(firstValue) && firstValue.length) {
+          message = firstValue[0];
+        } else if (typeof firstValue === "string") {
+          message = firstValue;
+        }
+      }
 
       setErrorMsg(message);
     } finally {
@@ -86,7 +119,6 @@ const Login = () => {
 
       <div className="login-page d-flex align-items-center justify-content-center">
         <div className="login-card shadow-lg">
-
           <div className="login-left">
             <h2 className="login-title">Welcome Back!</h2>
             <p className="login-subtext">Risk Management Dashboard</p>
@@ -140,18 +172,31 @@ const Login = () => {
                     Remember me
                   </label>
                 </div>
-                <a href="/forget-password" className="forgot-link" style={{ textDecoration: "none" }}>
+                <a
+                  href="/forget-password"
+                  className="forgot-link"
+                  style={{ textDecoration: "none" }}
+                >
                   Forgot password?
                 </a>
               </div>
 
-              <button type="submit" className="btn btn-primary w-100 login-btn" disabled={loading}>
+              <button
+                type="submit"
+                className="btn btn-primary w-100 login-btn"
+                disabled={loading}
+              >
                 {loading ? (
                   <>
-                    <span className="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+                    <span
+                      className="spinner-border spinner-border-sm me-2"
+                      aria-hidden="true"
+                    ></span>
                     Logging in...
                   </>
-                ) : "Login"}
+                ) : (
+                  "Login"
+                )}
               </button>
             </form>
 
@@ -165,7 +210,6 @@ const Login = () => {
             <p className="animated-caption">Manage risks like a pro</p>
             <img src={LandingLogo} alt="Risk Chart" className="chart-image mt-4" />
           </div>
-
         </div>
       </div>
 
